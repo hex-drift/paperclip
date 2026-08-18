@@ -23,6 +23,7 @@ import {
   runAdapterExecutionTargetProcess,
   startAdapterExecutionTargetPaperclipBridge,
 } from "@paperclipai/adapter-utils/execution-target";
+import { sequentialThinkingMcpEnabled } from "@paperclipai/adapter-utils/sequential-thinking-mcp";
 import {
   asString,
   asNumber,
@@ -547,6 +548,7 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
     onLog,
   });
   const runtimeMcpServers = ctx.runtimeMcp?.getServers() ?? [];
+  const attachMcpConfig = runtimeMcpServers.length > 0 || sequentialThinkingMcpEnabled(process.env);
   const runtimeMcpIdentity = JSON.stringify(
     runtimeMcpServers.map(({ name, url, connectionId }) => ({ name, url, connectionId })),
   );
@@ -900,7 +902,7 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
     if (attemptInstructionsFilePath && !resumeSessionId) {
       args.push("--append-system-prompt-file", attemptInstructionsFilePath);
     }
-    if (runtimeMcpServers.length > 0) {
+    if (attachMcpConfig) {
       args.push("--mcp-config", effectiveMcpConfigPath, "--strict-mcp-config");
     }
     args.push("--add-dir", effectivePromptBundleAddDir);
@@ -941,9 +943,11 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
         `Injected agent instructions via --append-system-prompt-file ${instructionsFilePath} (with path directive appended)`,
       );
     }
-    if (runtimeMcpServers.length > 0) {
+    if (attachMcpConfig) {
       commandNotes.push(
-        `Using ${runtimeMcpServers.length} Paperclip-managed MCP server(s) from strict config ${effectiveMcpConfigPath}.`,
+        runtimeMcpServers.length > 0
+          ? `Using ${runtimeMcpServers.length} Paperclip-managed MCP server(s) from strict config ${effectiveMcpConfigPath}.`
+          : `Using Sequential Thinking MCP from strict config ${effectiveMcpConfigPath}.`,
       );
     }
     if (onMeta) {

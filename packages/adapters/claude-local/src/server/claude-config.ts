@@ -8,6 +8,11 @@ import type {
   AdapterRuntimeMcpServer,
 } from "@paperclipai/adapter-utils";
 import {
+  SEQUENTIAL_THINKING_MCP_NAME,
+  sequentialThinkingClaudeServer,
+  sequentialThinkingMcpEnabled,
+} from "@paperclipai/adapter-utils/sequential-thinking-mcp";
+import {
   adapterExecutionTargetUsesManagedHome,
   maybeRunSandboxInstallCommand,
   prepareAdapterExecutionTargetRuntime,
@@ -177,6 +182,10 @@ export async function writePaperclipClaudeMcpConfig(input: {
       url: server.url,
       headers: { Authorization: `Bearer ${server.token}` },
     };
+  }
+  if (sequentialThinkingMcpEnabled(process.env) && !usedNames.has(SEQUENTIAL_THINKING_MCP_NAME)) {
+    usedNames.add(SEQUENTIAL_THINKING_MCP_NAME);
+    mcpServers[SEQUENTIAL_THINKING_MCP_NAME] = sequentialThinkingClaudeServer();
   }
   await fs.mkdir(configDir, { recursive: true });
   await fs.writeFile(configPath, JSON.stringify({ mcpServers }), { mode: 0o600 });

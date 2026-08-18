@@ -309,6 +309,25 @@ describe("prepareOpenCodeRuntimeConfig", () => {
     await prepared.cleanup();
   });
 
+  it("injects Sequential Thinking MCP when PAPERCLIP_SEQUENTIAL_THINKING_MCP is enabled", async () => {
+    const configHome = await makeConfigHome({ mcp: { existing: { type: "local", command: ["existing"] } } });
+    const prepared = await prepareOpenCodeRuntimeConfig({
+      env: { XDG_CONFIG_HOME: configHome, PAPERCLIP_SEQUENTIAL_THINKING_MCP: "1" },
+      config: {},
+    });
+    cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
+    const runtimeConfig = JSON.parse(
+      await fs.readFile(path.join(prepared.env.XDG_CONFIG_HOME, "opencode", "opencode.json"), "utf8"),
+    ) as { mcp: Record<string, unknown> };
+    expect(runtimeConfig.mcp["sequential-thinking"]).toEqual({
+      type: "local",
+      command: ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking"],
+    });
+    expect(runtimeConfig.mcp.existing).toEqual({ type: "local", command: ["existing"] });
+    expect(prepared.notes.some((n) => n.includes("Sequential Thinking"))).toBe(true);
+    await prepared.cleanup();
+  });
+
   it("respects explicit opt-out", async () => {
     const configHome = await makeConfigHome();
     const prepared = await prepareOpenCodeRuntimeConfig({

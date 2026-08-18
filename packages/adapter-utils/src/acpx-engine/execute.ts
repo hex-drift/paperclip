@@ -154,6 +154,10 @@ import {
   type StartupStepMeasureOptions,
   type StartupTraceContext,
 } from "./startup-timing.js";
+import {
+  sequentialThinkingAcpServer,
+  sequentialThinkingMcpEnabled,
+} from "../sequential-thinking-mcp.js";
 
 const defaultModuleDir = path.dirname(fileURLToPath(import.meta.url));
 const PAPERCLIP_MANAGED_CODEX_SKILLS_MANIFEST = ".paperclip-managed-skills.json";
@@ -1889,17 +1893,31 @@ async function buildRuntime(input: {
   const requestedThinkingEffort = normalizeRequestedThinkingEffort(config);
   const fastMode = acpxAgent === "codex" && config.fastMode === true;
   const runtimeMcpServers = input.ctx.runtimeMcp?.getServers() ?? [];
-  const mcpIdentity = runtimeMcpServers.map(({ name, url, connectionId }) => ({
-    name,
-    url,
-    connectionId,
-  }));
-  const mcpServers: NonNullable<AcpRuntimeOptions["mcpServers"]> = runtimeMcpServers.map((server) => ({
-    type: "http",
-    name: server.name,
-    url: server.url,
-    headers: [{ name: "Authorization", value: `Bearer ${server.token}` }],
-  }));
+  const mcpIdentity = [
+    ...runtimeMcpServers.map(({ name, url, connectionId }) => ({
+      name,
+      url,
+      connectionId,
+    })),
+    ...(sequentialThinkingMcpEnabled(process.env)
+      ? [{
+        name: sequentialThinkingAcpServer().name,
+        url: "stdio:sequential-thinking",
+        connectionId: "paperclip-builtin",
+      }]
+      : []),
+  ];
+  const mcpServers: NonNullable<AcpRuntimeOptions["mcpServers"]> = [
+    ...runtimeMcpServers.map((server) => ({
+      type: "http" as const,
+      name: server.name,
+      url: server.url,
+      headers: [{ name: "Authorization", value: `Bearer ${server.token}` }],
+    })),
+    ...(sequentialThinkingMcpEnabled(process.env)
+      ? [sequentialThinkingAcpServer() as NonNullable<AcpRuntimeOptions["mcpServers"]>[number]]
+      : []),
+  ];
   // Resolve the wall-clock timeout through the shared execution-target
   // resolver so sandbox-backed runs pick up the 4h backstop default while
   // local/SSH runs keep the historical "0 = no adapter timeout" behavior.

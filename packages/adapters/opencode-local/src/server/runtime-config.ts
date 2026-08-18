@@ -2,6 +2,11 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { asBoolean } from "@paperclipai/adapter-utils/server-utils";
+import {
+  SEQUENTIAL_THINKING_MCP_NAME,
+  sequentialThinkingMcpEnabled,
+  sequentialThinkingOpenCodeServer,
+} from "@paperclipai/adapter-utils/sequential-thinking-mcp";
 
 type PreparedOpenCodeRuntimeConfig = {
   env: Record<string, string>;
@@ -82,6 +87,37 @@ function parseProviderConfig(
     );
   }
   return Object.keys(providers).length > 0 ? providers : null;
+}
+
+function parseMcpConfig(
+  raw: unknown,
+  resolveEnv: (name: string) => string | undefined,
+  notes: string[],
+): Record<string, unknown> | null {
+  if (typeof raw !== "string" || raw.trim().length === 0) return null;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    notes.push("PAPERCLIP_OPENCODE_MCP contains invalid JSON; custom MCP servers ignored.");
+    return null;
+  }
+  if (!isPlainObject(parsed)) {
+    notes.push("PAPERCLIP_OPENCODE_MCP is set but is not a JSON object; custom MCP servers ignored.");
+    return null;
+  }
+  const servers: Record<string, unknown> = {};
+  const skipped: string[] = [];
+  for (const [key, value] of Object.entries(parsed)) {
+    if (isPlainObject(value)) servers[key] = expandEnvPlaceholders(value, resolveEnv);
+    else skipped.push(key);
+  }
+  if (skipped.length > 0) {
+    notes.push(
+      `PAPERCLIP_OPENCODE_MCP: skipped server(s) with non-object values: ${skipped.join(", ")}.`,
+    );
+  }
+  return Object.keys(servers).length > 0 ? servers : null;
 }
 
 function parseConfiguredModelRef(raw: unknown): { provider: string; model: string } | null {
@@ -208,6 +244,35 @@ export async function prepareOpenCodeRuntimeConfig(input: {
   };
   if (Object.keys(nextProvider).length > 0) {
     nextConfig.provider = nextProvider;
+  }
+
+  // Merge per-environment MCP servers supplied via PAPERCLIP_OPENCODE_MCP (a JSON
+  // object in OpenCode's `mcp` shape). The runtime config is copied from the host's
+  // XDG config dir, so an MCP server configured inside the execution target itself
+  // is invisible to the run. Agents that need a target-local MCP server (one bound
+  // to that machine's browser profile or credentials) declare it here, on the
+  // environment, instead of it having to exist for every agent on the host.
+  const mcpServers = parseMcpConfig(
+    input.env.PAPERCLIP_OPENCODE_MCP ?? process.env.PAPERCLIP_OPENCODE_MCP,
+    resolveEnv,
+    notes,
+  );
+  const existingMcp = isPlainObject(existingConfig.mcp) ? existingConfig.mcp : {};
+  const nextMcp: Record<string, unknown> = { ...existingMcp, ...(mcpServers ?? {}) };
+  if (mcpServers) {
+    notes.push(
+      `Injected ${Object.keys(mcpServers).length} MCP server(s) from PAPERCLIP_OPENCODE_MCP: ${Object.keys(mcpServers).join(", ")}.`,
+    );
+  }
+  if (
+    sequentialThinkingMcpEnabled(input.env) &&
+    !isPlainObject(nextMcp[SEQUENTIAL_THINKING_MCP_NAME])
+  ) {
+    nextMcp[SEQUENTIAL_THINKING_MCP_NAME] = sequentialThinkingOpenCodeServer();
+    notes.push("Injected Sequential Thinking MCP server.");
+  }
+  if (Object.keys(nextMcp).length > 0) {
+    nextConfig.mcp = nextMcp;
   }
 
   // Pin OpenCode's auxiliary "small" model (used for session-title generation and

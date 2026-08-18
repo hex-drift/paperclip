@@ -22,7 +22,7 @@ vi.mock("@paperclipai/adapter-utils/execution-target", async () => {
   };
 });
 
-import { prepareClaudeConfigSeed, prepareSandboxClaudeProbeRuntime } from "./claude-config.js";
+import { prepareClaudeConfigSeed, prepareSandboxClaudeProbeRuntime, writePaperclipClaudeMcpConfig } from "./claude-config.js";
 
 describe("prepareClaudeConfigSeed", () => {
   const cleanupDirs: string[] = [];
@@ -220,5 +220,36 @@ describe("prepareSandboxClaudeProbeRuntime managed-config diagnostics", () => {
       errorClass: "Error",
     });
     warnSpy.mockRestore();
+  });
+});
+
+describe("writePaperclipClaudeMcpConfig", () => {
+  const cleanupDirs: string[] = [];
+
+  afterEach(async () => {
+    delete process.env.PAPERCLIP_SEQUENTIAL_THINKING_MCP;
+    while (cleanupDirs.length > 0) {
+      const dir = cleanupDirs.pop();
+      if (!dir) continue;
+      await fs.rm(dir, { recursive: true, force: true }).catch(() => undefined);
+    }
+  });
+
+  it("injects Sequential Thinking when the env flag is enabled", async () => {
+    process.env.PAPERCLIP_SEQUENTIAL_THINKING_MCP = "1";
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "paperclip-claude-mcp-"));
+    cleanupDirs.push(root);
+    const configPath = await writePaperclipClaudeMcpConfig({
+      stateDir: root,
+      runId: "run-1",
+      servers: [],
+    });
+    const parsed = JSON.parse(await fs.readFile(configPath, "utf8")) as {
+      mcpServers: Record<string, { command?: string; args?: string[] }>;
+    };
+    expect(parsed.mcpServers["sequential-thinking"]).toEqual({
+      command: "npx",
+      args: ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+    });
   });
 });
