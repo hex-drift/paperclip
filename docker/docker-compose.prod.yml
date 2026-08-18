@@ -1,0 +1,328 @@
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+services:
+  db:
+    image: postgres:17-alpine
+    logging: *default-logging
+    environment:
+      POSTGRES_USER: paperclip
+      POSTGRES_PASSWORD: paperclip
+      POSTGRES_DB: paperclip
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paperclip -d paperclip"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  server:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    logging: *default-logging
+    user: root
+    expose:
+      - "3100"
+    environment:
+      DATABASE_URL: postgres://paperclip:paperclip@db:5432/paperclip
+      PORT: "3100"
+      SERVE_UI: "true"
+      PAPERCLIP_DEPLOYMENT_MODE: "authenticated"
+      PAPERCLIP_DEPLOYMENT_EXPOSURE: "public"
+      PAPERCLIP_PUBLIC_URL: "${PAPERCLIP_PUBLIC_URL:-https://controlplane.hexdrift.tech}"
+      BETTER_AUTH_SECRET: "${BETTER_AUTH_SECRET}"
+      OPENROUTER_API_KEY: "${OPENROUTER_API_KEY}"
+      BIGQUERY_PROJECT: "${BIGQUERY_PROJECT}"
+      BQ_SA_KEY: "${BQ_SA_KEY}"
+      GOOGLE_ADS_DEVELOPER_TOKEN: "${GOOGLE_ADS_DEVELOPER_TOKEN}"
+      GOOGLE_ADS_AUTH_TYPE: "${GOOGLE_ADS_AUTH_TYPE:-service_account}"
+      GOOGLE_ADS_CUSTOMER_ID: "${GOOGLE_ADS_CUSTOMER_ID:-3261198731}"
+      GOOGLE_ADS_LOGIN_CUSTOMER_ID: "${GOOGLE_ADS_LOGIN_CUSTOMER_ID:-}"
+      GOOGLE_ADS_IMPERSONATION_EMAIL: "${GOOGLE_ADS_IMPERSONATION_EMAIL:-}"
+      CIO_TOKEN: "${CIO_TOKEN:-}"
+      GA_PROPERTY_ID: "${GA_PROPERTY_ID:-487606704}"
+      CLICKHOUSE_USER: "${CLICKHOUSE_USER:-}"
+      CLICKHOUSE_PASSWORD: "${CLICKHOUSE_PASSWORD:-}"
+      CLICKHOUSE_MCP_SERVERS: "${CLICKHOUSE_MCP_SERVERS:-ganso@185.159.108.229:8123,softgaming@168.119.60.10:8123/datasets}"
+      CLICKHOUSE_SECURE: "${CLICKHOUSE_SECURE:-false}"
+      CLICKHOUSE_VERIFY: "${CLICKHOUSE_VERIFY:-false}"
+      PAPERCLIP_STORAGE_PROVIDER: "${PAPERCLIP_STORAGE_PROVIDER:-s3}"
+      PAPERCLIP_STORAGE_S3_BUCKET: "${PAPERCLIP_STORAGE_S3_BUCKET}"
+      PAPERCLIP_STORAGE_S3_REGION: "${PAPERCLIP_STORAGE_S3_REGION:-auto}"
+      PAPERCLIP_STORAGE_S3_ENDPOINT: "${PAPERCLIP_STORAGE_S3_ENDPOINT}"
+      PAPERCLIP_STORAGE_S3_PREFIX: "${PAPERCLIP_STORAGE_S3_PREFIX:-}"
+      PAPERCLIP_STORAGE_S3_FORCE_PATH_STYLE: "${PAPERCLIP_STORAGE_S3_FORCE_PATH_STYLE:-true}"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+      AWS_REGION: "${AWS_REGION:-auto}"
+      PAPERCLIP_SANDBOX_PROVIDER: "docker"
+      PAPERCLIP_DOCKER_SANDBOX_IMAGE: "ghcr.io/paperclipai/sandbox:latest"
+      PAPERCLIP_HOME: "/paperclip"
+      HOME: "/home/node"
+      GEMINI_CLI_TRUST_WORKSPACE: "true"
+    volumes:
+      - paperclip-data:/paperclip
+      - /var/run/docker.sock:/var/run/docker.sock
+      - paperclip-worker-home:/home/node
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      "
+        apt-get update && apt-get install -y procps ripgrep &&
+        npm install -g @google/gemini-cli &&
+        chown -R node:node /home/node &&
+        MCP_CONFIG_HOME=/home/node GCP_SA_KEY_PATH=/home/node/gcp-sa-key.json MCP_RUNTIME_USER=node /usr/local/bin/docker-mcp-bootstrap.sh &&
+        CUSTOMERIO_HOME=/home/node CUSTOMERIO_RUNTIME_USER=node /usr/local/bin/docker-customerio-bootstrap.sh &&
+        rm -rf /paperclip/.gemini &&
+        ln -sfn /home/node/.gemini /paperclip/.gemini &&
+        chown -h node:node /paperclip/.gemini &&
+        exec gosu node node --import ./server/node_modules/tsx/dist/loader.mjs server/dist/index.js
+      "
+    depends_on:
+      db:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - server
+
+  agent-1:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.agent-ssh
+    image: paperclip-agent:latest
+    hostname: agent-1
+    logging: *default-logging
+    environment:
+      AGENT_AUTHORIZED_KEY: "${AGENT_AUTHORIZED_KEY}"
+      BIGQUERY_PROJECT: "${BIGQUERY_PROJECT}"
+      BQ_SA_KEY: "${BQ_SA_KEY}"
+      GOOGLE_ADS_DEVELOPER_TOKEN: "${GOOGLE_ADS_DEVELOPER_TOKEN}"
+      GOOGLE_ADS_AUTH_TYPE: "${GOOGLE_ADS_AUTH_TYPE:-service_account}"
+      GOOGLE_ADS_CUSTOMER_ID: "${GOOGLE_ADS_CUSTOMER_ID:-3261198731}"
+      GOOGLE_ADS_LOGIN_CUSTOMER_ID: "${GOOGLE_ADS_LOGIN_CUSTOMER_ID:-}"
+      GOOGLE_ADS_IMPERSONATION_EMAIL: "${GOOGLE_ADS_IMPERSONATION_EMAIL:-}"
+      CIO_TOKEN: "${CIO_TOKEN:-}"
+      GA_PROPERTY_ID: "${GA_PROPERTY_ID:-487606704}"
+      CLICKHOUSE_USER: "${CLICKHOUSE_USER:-}"
+      CLICKHOUSE_PASSWORD: "${CLICKHOUSE_PASSWORD:-}"
+      CLICKHOUSE_MCP_SERVERS: "${CLICKHOUSE_MCP_SERVERS:-ganso@185.159.108.229:8123,softgaming@168.119.60.10:8123/datasets}"
+      CLICKHOUSE_SECURE: "${CLICKHOUSE_SECURE:-false}"
+      CLICKHOUSE_VERIFY: "${CLICKHOUSE_VERIFY:-false}"
+    volumes:
+      - agent-1-workspace:/workspace
+    restart: unless-stopped
+
+  agent-2:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.agent-ssh
+    image: paperclip-agent:latest
+    hostname: agent-2
+    logging: *default-logging
+    environment:
+      AGENT_AUTHORIZED_KEY: "${AGENT_AUTHORIZED_KEY}"
+      BIGQUERY_PROJECT: "${BIGQUERY_PROJECT}"
+      BQ_SA_KEY: "${BQ_SA_KEY}"
+      GOOGLE_ADS_DEVELOPER_TOKEN: "${GOOGLE_ADS_DEVELOPER_TOKEN}"
+      GOOGLE_ADS_AUTH_TYPE: "${GOOGLE_ADS_AUTH_TYPE:-service_account}"
+      GOOGLE_ADS_CUSTOMER_ID: "${GOOGLE_ADS_CUSTOMER_ID:-3261198731}"
+      GOOGLE_ADS_LOGIN_CUSTOMER_ID: "${GOOGLE_ADS_LOGIN_CUSTOMER_ID:-}"
+      GOOGLE_ADS_IMPERSONATION_EMAIL: "${GOOGLE_ADS_IMPERSONATION_EMAIL:-}"
+      CIO_TOKEN: "${CIO_TOKEN:-}"
+      GA_PROPERTY_ID: "${GA_PROPERTY_ID:-487606704}"
+      CLICKHOUSE_USER: "${CLICKHOUSE_USER:-}"
+      CLICKHOUSE_PASSWORD: "${CLICKHOUSE_PASSWORD:-}"
+      CLICKHOUSE_MCP_SERVERS: "${CLICKHOUSE_MCP_SERVERS:-ganso@185.159.108.229:8123,softgaming@168.119.60.10:8123/datasets}"
+      CLICKHOUSE_SECURE: "${CLICKHOUSE_SECURE:-false}"
+      CLICKHOUSE_VERIFY: "${CLICKHOUSE_VERIFY:-false}"
+    volumes:
+      - agent-2-workspace:/workspace
+    restart: unless-stopped
+
+  agent-3:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.agent-ssh
+    image: paperclip-agent:latest
+    hostname: agent-3
+    logging: *default-logging
+    environment:
+      AGENT_AUTHORIZED_KEY: "${AGENT_AUTHORIZED_KEY}"
+      BIGQUERY_PROJECT: "${BIGQUERY_PROJECT}"
+      BQ_SA_KEY: "${BQ_SA_KEY}"
+      GOOGLE_ADS_DEVELOPER_TOKEN: "${GOOGLE_ADS_DEVELOPER_TOKEN}"
+      GOOGLE_ADS_AUTH_TYPE: "${GOOGLE_ADS_AUTH_TYPE:-service_account}"
+      GOOGLE_ADS_CUSTOMER_ID: "${GOOGLE_ADS_CUSTOMER_ID:-3261198731}"
+      GOOGLE_ADS_LOGIN_CUSTOMER_ID: "${GOOGLE_ADS_LOGIN_CUSTOMER_ID:-}"
+      GOOGLE_ADS_IMPERSONATION_EMAIL: "${GOOGLE_ADS_IMPERSONATION_EMAIL:-}"
+      CIO_TOKEN: "${CIO_TOKEN:-}"
+      GA_PROPERTY_ID: "${GA_PROPERTY_ID:-487606704}"
+      CLICKHOUSE_USER: "${CLICKHOUSE_USER:-}"
+      CLICKHOUSE_PASSWORD: "${CLICKHOUSE_PASSWORD:-}"
+      CLICKHOUSE_MCP_SERVERS: "${CLICKHOUSE_MCP_SERVERS:-ganso@185.159.108.229:8123,softgaming@168.119.60.10:8123/datasets}"
+      CLICKHOUSE_SECURE: "${CLICKHOUSE_SECURE:-false}"
+      CLICKHOUSE_VERIFY: "${CLICKHOUSE_VERIFY:-false}"
+    volumes:
+      - agent-3-workspace:/workspace
+    restart: unless-stopped
+
+  agent-4:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.agent-ssh
+    image: paperclip-agent:latest
+    hostname: agent-4
+    logging: *default-logging
+    environment:
+      AGENT_AUTHORIZED_KEY: "${AGENT_AUTHORIZED_KEY}"
+      BIGQUERY_PROJECT: "${BIGQUERY_PROJECT}"
+      BQ_SA_KEY: "${BQ_SA_KEY}"
+      GOOGLE_ADS_DEVELOPER_TOKEN: "${GOOGLE_ADS_DEVELOPER_TOKEN}"
+      GOOGLE_ADS_AUTH_TYPE: "${GOOGLE_ADS_AUTH_TYPE:-service_account}"
+      GOOGLE_ADS_CUSTOMER_ID: "${GOOGLE_ADS_CUSTOMER_ID:-3261198731}"
+      GOOGLE_ADS_LOGIN_CUSTOMER_ID: "${GOOGLE_ADS_LOGIN_CUSTOMER_ID:-}"
+      GOOGLE_ADS_IMPERSONATION_EMAIL: "${GOOGLE_ADS_IMPERSONATION_EMAIL:-}"
+      CIO_TOKEN: "${CIO_TOKEN:-}"
+      GA_PROPERTY_ID: "${GA_PROPERTY_ID:-487606704}"
+      CLICKHOUSE_USER: "${CLICKHOUSE_USER:-}"
+      CLICKHOUSE_PASSWORD: "${CLICKHOUSE_PASSWORD:-}"
+      CLICKHOUSE_MCP_SERVERS: "${CLICKHOUSE_MCP_SERVERS:-ganso@185.159.108.229:8123,softgaming@168.119.60.10:8123/datasets}"
+      CLICKHOUSE_SECURE: "${CLICKHOUSE_SECURE:-false}"
+      CLICKHOUSE_VERIFY: "${CLICKHOUSE_VERIFY:-false}"
+    volumes:
+      - agent-4-workspace:/workspace
+    restart: unless-stopped
+
+  agent-5:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.agent-ssh
+    image: paperclip-agent:latest
+    hostname: agent-5
+    logging: *default-logging
+    environment:
+      AGENT_AUTHORIZED_KEY: "${AGENT_AUTHORIZED_KEY}"
+      BIGQUERY_PROJECT: "${BIGQUERY_PROJECT}"
+      BQ_SA_KEY: "${BQ_SA_KEY}"
+      GOOGLE_ADS_DEVELOPER_TOKEN: "${GOOGLE_ADS_DEVELOPER_TOKEN}"
+      GOOGLE_ADS_AUTH_TYPE: "${GOOGLE_ADS_AUTH_TYPE:-service_account}"
+      GOOGLE_ADS_CUSTOMER_ID: "${GOOGLE_ADS_CUSTOMER_ID:-3261198731}"
+      GOOGLE_ADS_LOGIN_CUSTOMER_ID: "${GOOGLE_ADS_LOGIN_CUSTOMER_ID:-}"
+      GOOGLE_ADS_IMPERSONATION_EMAIL: "${GOOGLE_ADS_IMPERSONATION_EMAIL:-}"
+      CIO_TOKEN: "${CIO_TOKEN:-}"
+      GA_PROPERTY_ID: "${GA_PROPERTY_ID:-487606704}"
+      CLICKHOUSE_USER: "${CLICKHOUSE_USER:-}"
+      CLICKHOUSE_PASSWORD: "${CLICKHOUSE_PASSWORD:-}"
+      CLICKHOUSE_MCP_SERVERS: "${CLICKHOUSE_MCP_SERVERS:-ganso@185.159.108.229:8123,softgaming@168.119.60.10:8123/datasets}"
+      CLICKHOUSE_SECURE: "${CLICKHOUSE_SECURE:-false}"
+      CLICKHOUSE_VERIFY: "${CLICKHOUSE_VERIFY:-false}"
+    volumes:
+      - agent-5-workspace:/workspace
+    restart: unless-stopped
+
+  remote-code-reviw-1:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.agent-ssh
+    image: paperclip-agent:latest
+    hostname: remote-code-reviw-1
+    logging: *default-logging
+    environment:
+      AGENT_AUTHORIZED_KEY: "${AGENT_AUTHORIZED_KEY}"
+      OPENCODE_ALLOW_ALL_MODELS: "true"
+      CODE_REVIEW_GRAPH_MCP_ENABLED: "true"
+      AI_GATE_BASE_URL: "https://ai-gate.hexdrift.tech/v1"
+      AI_GATE_API_KEY: "${OPENROUTER_API_KEY}"
+    volumes:
+      - remote-code-reviw-1-workspace:/workspace
+      - remote-code-reviw-1-home:/home/agent
+    restart: unless-stopped
+
+  proxied-agent-1:
+    image: paperclip-agent:latest
+    hostname: proxied-agent-1
+    logging: *default-logging
+    environment:
+      AGENT_AUTHORIZED_KEY: "${AGENT_AUTHORIZED_KEY}"
+      OPENCODE_ALLOW_ALL_MODELS: "true"
+      AI_GATE_BASE_URL: "https://ai-gate.hexdrift.tech/v1"
+      AI_GATE_API_KEY: "${OPENROUTER_API_KEY}"
+    volumes:
+      - proxied-agent-1-workspace:/workspace
+      - proxied-agent-1-home:/home/agent
+    restart: unless-stopped
+
+  linkedin-konstantin:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.linkedin-agent
+    image: paperclip-linkedin-agent:latest
+    hostname: linkedin-konstantin
+    logging: *default-logging
+    environment:
+      AGENT_AUTHORIZED_KEY: "${LINKEDIN_KONSTANTIN_AUTHORIZED_KEY}"
+      OPENCODE_ALLOW_ALL_MODELS: "true"
+      OPENROUTER_API_KEY: "${OPENROUTER_API_KEY}"
+      OPENROUTER_BASE_URL: "https://ai-gate.hexdrift.tech/v1"
+      LINKEDIN_USER_AGENT: "${LINKEDIN_USER_AGENT:-Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36}"
+    volumes:
+      - linkedin-konstantin-workspace:/workspace
+      - linkedin-konstantin-profile:/linkedin-profile
+      - linkedin-konstantin-home:/home/agent
+    restart: unless-stopped
+
+  linkedin-olha:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.linkedin-agent
+    image: paperclip-linkedin-agent:latest
+    hostname: linkedin-olha
+    logging: *default-logging
+    environment:
+      AGENT_AUTHORIZED_KEY: "${LINKEDIN_OLHA_AUTHORIZED_KEY}"
+      OPENCODE_ALLOW_ALL_MODELS: "true"
+      OPENROUTER_API_KEY: "${OPENROUTER_API_KEY}"
+      OPENROUTER_BASE_URL: "https://ai-gate.hexdrift.tech/v1"
+      LINKEDIN_USER_AGENT: "${LINKEDIN_USER_AGENT:-Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36}"
+    volumes:
+      - linkedin-olha-workspace:/workspace
+      - linkedin-olha-profile:/linkedin-profile
+      - linkedin-olha-home:/home/agent
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  paperclip-data:
+  paperclip-worker-home:
+  caddy_data:
+  caddy_config:
+  agent-1-workspace:
+  agent-2-workspace:
+  agent-3-workspace:
+  agent-4-workspace:
+  agent-5-workspace:
+  remote-code-reviw-1-workspace:
+  remote-code-reviw-1-home:
+  proxied-agent-1-workspace:
+  proxied-agent-1-home:
+  linkedin-konstantin-workspace:
+  linkedin-konstantin-profile:
+  linkedin-konstantin-home:
+  linkedin-olha-workspace:
+  linkedin-olha-profile:
+  linkedin-olha-home:
