@@ -78,7 +78,8 @@ WORKDIR /app
 # (the single most expensive layer: four CLI toolchains + apt, per arch) can
 # never hit the layer cache and rebuilds on every build.
 RUN echo "cli-tools-epoch: ${CLI_TOOLS_CACHE_EPOCH}" \
-  && npm install --global --omit=dev @anthropic-ai/claude-code@latest @openai/codex@latest opencode-ai @google/gemini-cli@latest \
+  && npm install --global --omit=dev @anthropic-ai/claude-code@latest @openai/codex@latest opencode-ai @google/gemini-cli@latest @customerio/cli@latest playwright@latest \
+  && npx playwright install-deps chromium \
   && apt-get update \
   && apt-get install -y --no-install-recommends openssh-client jq \
   && rm -rf /var/lib/apt/lists/* \
@@ -86,7 +87,10 @@ RUN echo "cli-tools-epoch: ${CLI_TOOLS_CACHE_EPOCH}" \
   && chown node:node /paperclip
 
 COPY scripts/docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+COPY scripts/docker-mcp-bootstrap.sh /usr/local/bin/
+COPY scripts/docker-customerio-bootstrap.sh /usr/local/bin/
+COPY scripts/write-gcp-mcp-config.mjs /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh /usr/local/bin/docker-mcp-bootstrap.sh /usr/local/bin/docker-customerio-bootstrap.sh
 
 COPY --chown=node:node --from=build /app /app
 

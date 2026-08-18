@@ -90,6 +90,25 @@ BETTER_AUTH_SECRET=$(openssl rand -hex 32) \
 
 PostgreSQL data persists in a named Docker volume (`pgdata`). Paperclip data persists in `paperclip-data`.
 
+### Production stack (`docker-compose.prod.yml`)
+
+Internet-facing deployment with Caddy TLS, PostgreSQL, Paperclip server, and SSH agent workers.
+
+```sh
+cd docker
+cp .env.example .env   # fill BETTER_AUTH_SECRET, OPENROUTER_API_KEY, AGENT_AUTHORIZED_KEY
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+All services use json-file log rotation (`max-size: 10m`, `max-file: 5`, ~50 MB cap per container). To apply the same defaults host-wide for ad-hoc containers, copy `docker/daemon.json.example` to `/etc/docker/daemon.json` and restart Docker.
+
+To truncate existing container logs after enabling rotation:
+
+```sh
+truncate -s 0 /var/lib/docker/containers/*/*-json.log
+docker compose -f docker-compose.prod.yml up -d
+```
+
 ### Untrusted PR review
 
 Isolated container for reviewing untrusted pull requests with Codex or Claude, without exposing your host machine. See `doc/UNTRUSTED-PR-REVIEW.md` for the full workflow.

@@ -119,6 +119,70 @@ describe("prepareOpenCodeRuntimeConfig", () => {
     }
   });
 
+  it("merges MCP servers from PAPERCLIP_OPENCODE_MCP into the config", async () => {
+    const configHome = await makeConfigHome({ mcp: { existing: { type: "local", command: ["existing"] } } });
+    const mcp = {
+      linkedin: {
+        type: "local",
+        command: ["uvx", "mcp-server-linkedin@latest"],
+        environment: { USER_DATA_DIR: "/linkedin-profile/profile" },
+      },
+    };
+
+    const prepared = await prepareOpenCodeRuntimeConfig({
+      env: { XDG_CONFIG_HOME: configHome, PAPERCLIP_OPENCODE_MCP: JSON.stringify(mcp) },
+      config: {},
+    });
+    cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
+
+    const runtimeConfig = JSON.parse(
+      await fs.readFile(path.join(prepared.env.XDG_CONFIG_HOME, "opencode", "opencode.json"), "utf8"),
+    ) as Record<string, unknown>;
+    // Existing servers from the host config survive; the injected one is added.
+    expect(runtimeConfig.mcp).toEqual({
+      existing: { type: "local", command: ["existing"] },
+      ...mcp,
+    });
+    expect(prepared.notes.some((n) => n.includes("linkedin"))).toBe(true);
+    await prepared.cleanup();
+  });
+
+  it("expands {env:VAR} placeholders in MCP server definitions", async () => {
+    const configHome = await makeConfigHome({});
+    const mcp = {
+      linkedin: { type: "local", command: ["uvx", "x"], environment: { USER_AGENT: "{env:LINKEDIN_USER_AGENT}" } },
+    };
+    const prepared = await prepareOpenCodeRuntimeConfig({
+      env: {
+        XDG_CONFIG_HOME: configHome,
+        PAPERCLIP_OPENCODE_MCP: JSON.stringify(mcp),
+        LINKEDIN_USER_AGENT: "Mozilla/5.0 Test",
+      },
+      config: {},
+    });
+    cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
+    const runtimeConfig = JSON.parse(
+      await fs.readFile(path.join(prepared.env.XDG_CONFIG_HOME, "opencode", "opencode.json"), "utf8"),
+    ) as { mcp: { linkedin: { environment: { USER_AGENT: string } } } };
+    expect(runtimeConfig.mcp.linkedin.environment.USER_AGENT).toBe("Mozilla/5.0 Test");
+    await prepared.cleanup();
+  });
+
+  it("leaves the config untouched when PAPERCLIP_OPENCODE_MCP is invalid JSON", async () => {
+    const configHome = await makeConfigHome({ mcp: { existing: { type: "local", command: ["existing"] } } });
+    const prepared = await prepareOpenCodeRuntimeConfig({
+      env: { XDG_CONFIG_HOME: configHome, PAPERCLIP_OPENCODE_MCP: "{not json" },
+      config: {},
+    });
+    cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
+    const runtimeConfig = JSON.parse(
+      await fs.readFile(path.join(prepared.env.XDG_CONFIG_HOME, "opencode", "opencode.json"), "utf8"),
+    ) as Record<string, unknown>;
+    expect(runtimeConfig.mcp).toEqual({ existing: { type: "local", command: ["existing"] } });
+    expect(prepared.notes.some((n) => n.includes("invalid JSON"))).toBe(true);
+    await prepared.cleanup();
+  });
+
   it("expands {env:VAR} placeholders in custom providers using the run/process env (bakes the literal vk)", async () => {
     const configHome = await makeConfigHome({ permission: { read: "allow" } });
     const providers = {

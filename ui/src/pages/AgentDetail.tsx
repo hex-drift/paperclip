@@ -98,6 +98,7 @@ import {
   MAX_LIVE_EVENTS,
   MAX_LIVE_LOG_LINES,
 } from "../lib/live-log-buffer";
+import { readRunSessionMessage } from "../lib/run-session-message";
 import {
   isUuidLike,
   type Agent,
@@ -3243,6 +3244,17 @@ function RunDetail({ run: initialRun, agentRouteId, adapterType, adapterConfig }
     enabled: Boolean(run.companyId && run.responsibleUserId),
     retry: false,
   });
+  const censorUsernameInLogs = useQuery({
+    queryKey: queryKeys.instance.generalSettings,
+    queryFn: () => instanceSettingsApi.getGeneral(),
+  }).data?.censorUsernameInLogs === true;
+  const sessionMessage = useMemo(
+    () => readRunSessionMessage(run.contextSnapshot),
+    [run.contextSnapshot],
+  );
+  const sessionMessageText = sessionMessage
+    ? redactCommandText(sessionMessage.text, censorUsernameInLogs)
+    : null;
   const responsibleUserName = useMemo(() => {
     if (!run.responsibleUserId) return null;
     const entry = userDirectory?.users.find(
@@ -3672,6 +3684,22 @@ function RunDetail({ run: initialRun, agentRouteId, adapterType, adapterConfig }
           </div>
         )}
       </div>
+
+      {sessionMessageText && (
+        <div className="space-y-2">
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="text-xs font-medium text-muted-foreground">Session message</span>
+            {(sessionMessage?.pluginKey || sessionMessage?.source) && (
+              <span className="text-(length:--text-micro) text-muted-foreground truncate">
+                {sessionMessage?.pluginKey ?? sessionMessage?.source}
+              </span>
+            )}
+          </div>
+          <div className="border border-border rounded-lg px-3 py-2 text-sm whitespace-pre-wrap break-words">
+            {sessionMessageText}
+          </div>
+        </div>
+      )}
 
       {/* Issues touched by this run */}
       {touchedIssues && touchedIssues.length > 0 && (

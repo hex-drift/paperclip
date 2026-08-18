@@ -159,6 +159,20 @@ export const DEFAULT_SANDBOX_CALLBACK_BRIDGE_ROUTE_ALLOWLIST: readonly SandboxCa
   { method: "POST", path: /^\/api\/routines\/[^/]+\/triggers$/ },
   { method: "PATCH", path: /^\/api\/routine-triggers\/[^/]+$/ },
   { method: "DELETE", path: /^\/api\/routine-triggers\/[^/]+$/ },
+
+  // Pipelines and cases (agents read their pipelines and manage case records)
+  { method: "GET", path: /^\/api\/companies\/[^/]+\/pipelines$/ },
+  { method: "GET", path: /^\/api\/companies\/[^/]+\/cases$/ },
+  { method: "GET", path: /^\/api\/pipelines\/[^/]+$/ },
+  { method: "GET", path: /^\/api\/pipelines\/[^/]+\/cases$/ },
+  { method: "POST", path: /^\/api\/pipelines\/[^/]+\/cases$/ },
+  { method: "POST", path: /^\/api\/pipelines\/[^/]+\/cases\/batch$/ },
+  { method: "GET", path: /^\/api\/cases\/[^/]+$/ },
+  { method: "PATCH", path: /^\/api\/cases\/[^/]+$/ },
+  { method: "POST", path: /^\/api\/cases\/[^/]+\/transition$/ },
+  { method: "POST", path: /^\/api\/cases\/[^/]+\/claim$/ },
+  { method: "POST", path: /^\/api\/cases\/[^/]+\/release$/ },
+  { method: "GET", path: /^\/api\/cases\/[^/]+\/children$/ },
 ] as const;
 
 export const DEFAULT_SANDBOX_CALLBACK_BRIDGE_HEADER_ALLOWLIST = [

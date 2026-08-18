@@ -1,0 +1,53 @@
+{
+  "$meta": {
+    "version": 1,
+    "updatedAt": "2026-05-12T22:13:30.000Z",
+    "source": "onboard"
+  },
+  "database": {
+    "mode": "postgres",
+    "connectionString": "postgres://paperclip:paperclip@db:5432/paperclip",
+    "embeddedPostgresDataDir": "/paperclip/instances/default/db",
+    "embeddedPostgresPort": 54329,
+    "backup": {
+      "enabled": true,
+      "intervalMinutes": 60,
+      "retentionDays": 30,
+      "dir": "/paperclip/instances/default/data/backups"
+    }
+  },
+  "logging": {
+    "mode": "file",
+    "logDir": "/paperclip/instances/default/logs"
+  },
+  "server": {
+    "deploymentMode": "authenticated",
+    "exposure": "public",
+    "bind": "lan",
+    "host": "0.0.0.0",
+    "port": 3100,
+    "allowedHostnames": ["controlplane.hexdrift.tech"],
+    "serveUi": true
+  },
+  "auth": {
+    "baseUrlMode": "explicit",
+    "publicBaseUrl": "https://controlplane.hexdrift.tech",
+    "disableSignUp": false
+  },
+  "telemetry": {
+    "enabled": true
+  },
+  "storage": {
+    "provider": "local_disk",
+    "localDisk": {
+      "baseDir": "/paperclip/instances/default/data/storage"
+    }
+  },
+  "secrets": {
+    "provider": "local_encrypted",
+    "strictMode": false,
+    "localEncrypted": {
+      "keyFilePath": "/paperclip/instances/default/secrets/master.key"
+    }
+  }
+}

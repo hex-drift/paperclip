@@ -1,0 +1,53 @@
+# syntax=docker/dockerfile:1.20
+FROM node:lts-trixie-slim
+
+ARG AGENT_USER=agent
+ARG AGENT_UID=2000
+ARG AGENT_GID=2000
+
+USER root
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    openssh-server git curl wget ripgrep ca-certificates procps \
+    libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libgbm1 \
+    libgtk-3-0 libxkbcommon0 libxss1 libasound2 libx11-6 libxcomposite1 \
+    libxdamage1 libxext6 libxfixes3 libxrandr2 libxrender1 libxtst6 \
+    fonts-liberation xdg-utils \
+  && rm -rf /var/lib/apt/lists/* \
+  && groupadd -g ${AGENT_GID} ${AGENT_USER} \
+  && useradd -u ${AGENT_UID} -g ${AGENT_GID} -m -s /bin/bash ${AGENT_USER}
+
+RUN npm install -g opencode-ai agent-browser
+
+USER ${AGENT_USER}
+RUN agent-browser install
+RUN npx skills add vercel-labs/agent-browser --yes --global || true
+USER root
+
+RUN mkdir -p /run/sshd /home/${AGENT_USER}/.ssh /workspace /linkedin-profile \
+  && ssh-keygen -A \
+  && echo "PasswordAuthentication no" >> /etc/ssh/sshd_config \
+  && echo "ChallengeResponseAuthentication no" >> /etc/ssh/sshd_config \
+  && echo "UsePAM no" >> /etc/ssh/sshd_config \
+  && echo "X11Forwarding no" >> /etc/ssh/sshd_config \
+  && echo "PrintMotd no" >> /etc/ssh/sshd_config \
+  && echo "AcceptEnv *" >> /etc/ssh/sshd_config \
+  && echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config \
+  && echo "Subsystem sftp /usr/lib/openssh/sftp-server" >> /etc/ssh/sshd_config \
+  && chown -R ${AGENT_USER}:${AGENT_USER} /home/${AGENT_USER}/.ssh /workspace /linkedin-profile \
+  && chmod 700 /home/${AGENT_USER}/.ssh
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
+
+ENV PATH="/root/.local/bin:/home/agent/.local/bin:${PATH}" \
+  LINKEDIN_USER_DATA_DIR=/linkedin-profile/profile
+
+COPY scripts/docker-linkedin-agent-entrypoint.sh /usr/local/bin/
+COPY scripts/write-linkedin-mcp-config.mjs /usr/local/bin/
+COPY scripts/bootstrap-linkedin-mcp-session.py /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-linkedin-agent-entrypoint.sh
+
+VOLUME ["/workspace", "/linkedin-profile", "/home/agent"]
+
+ENTRYPOINT ["docker-linkedin-agent-entrypoint.sh"]
