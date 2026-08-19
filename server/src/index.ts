@@ -87,6 +87,7 @@ import {
 import { questionResponseDeliveryService } from "./services/question-response-delivery.js";
 import { deliverNativeQuestionResponse } from "./services/native-runtime/native-question-bridge.js";
 import { queueIssueAssignmentWakeup } from "./services/issue-assignment-wakeup.js";
+import { sweepStaleScratchDirs } from "./services/run-scratch.js";
 import { createSecretProposalsService } from "./services/secret-proposals.js";
 import { environmentRuntimeService } from "./services/environment-runtime.js";
 import { createDbAdapterAuthSessionStore } from "./services/device-login-service.js";
@@ -1127,6 +1128,15 @@ async function startServerWithDatabaseTeardown(
     throw err;
   }
 
+  // Sweep orphaned scratch dirs left by a previous server crash/restart.
+  sweepStaleScratchDirs(30 * 60 * 1000).then((result) => {
+    if (result.swept > 0 || result.errors > 0) {
+      logger.info(result, "startup sweep of stale scratch dirs complete");
+    }
+  }).catch((err) => {
+    logger.warn({ err }, "startup sweep of stale scratch dirs failed");
+  });
+
   let drainHeartbeatRunsForShutdown: ((
     signal: "SIGINT" | "SIGTERM",
     runIds?: readonly string[] | null,
@@ -1633,6 +1643,13 @@ async function startServerWithDatabaseTeardown(
         }));
         trackHeartbeatSchedulerWork(runRetentionSweep().catch((err: unknown) => {
           logger.error({ err }, "decision retention sweep failed");
+        }));
+        trackHeartbeatSchedulerWork(sweepStaleScratchDirs(30 * 60 * 1000).then((result) => {
+          if (result.swept > 0) {
+            logger.info(result, "periodic sweep removed stale scratch dirs");
+          }
+        }).catch((err: unknown) => {
+          logger.warn({ err }, "periodic sweep of stale scratch dirs failed");
         }));
         const sweptRuntimeStatuses = heartbeat.sweepExpiredRuntimeStatuses();
         if (sweptRuntimeStatuses > 0) {

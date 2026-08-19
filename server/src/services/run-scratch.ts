@@ -155,3 +155,49 @@ export async function cleanupHeartbeatRunScratch(input: {
   await fs.rm(dir, { recursive: true, force: true });
   return { removed: true, dir };
 }
+
+export interface SweepStaleScratchDirsResult {
+  swept: number;
+  errors: number;
+}
+
+/**
+ * Remove orphaned paperclip-run-* and paperclip-opencode-config-* directories
+ * from os.tmpdir() that are older than `maxAgeMs`. Orphans accumulate when the
+ * server restarts before cleanup can run for in-flight heartbeats.
+ */
+export async function sweepStaleScratchDirs(
+  maxAgeMs: number = 30 * 60 * 1000,
+): Promise<SweepStaleScratchDirsResult> {
+  const tmpRoot = os.tmpdir();
+  let swept = 0;
+  let errors = 0;
+  let names: string[];
+  try {
+    names = await fs.readdir(tmpRoot);
+  } catch {
+    return { swept: 0, errors: 1 };
+  }
+  const cutoff = Date.now() - maxAgeMs;
+  await Promise.all(
+    names
+      .filter(
+        (name) =>
+          name.startsWith("paperclip-run-") || name.startsWith("paperclip-opencode-config-"),
+      )
+      .map(async (name) => {
+        const dir = path.join(tmpRoot, name);
+        try {
+          const stat = await fs.stat(dir);
+          if (!stat.isDirectory()) return;
+          if (stat.mtimeMs < cutoff) {
+            await fs.rm(dir, { recursive: true, force: true });
+            swept++;
+          }
+        } catch {
+          errors++;
+        }
+      }),
+  );
+  return { swept, errors };
+}
