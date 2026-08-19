@@ -128,6 +128,12 @@ function parseConfiguredModelRef(raw: unknown): { provider: string; model: strin
   return { provider: trimmed.slice(0, slash), model: trimmed.slice(slash + 1) };
 }
 
+/** Heavy install trees do not belong in the per-run XDG copy under /tmp. */
+function shouldCopyOpenCodeConfigPath(sourcePath: string): boolean {
+  const parts = sourcePath.split(path.sep);
+  return !parts.includes("node_modules") && !parts.includes(".cache");
+}
+
 async function readJsonObject(filepath: string): Promise<Record<string, unknown>> {
   try {
     const raw = await fs.readFile(filepath, "utf8");
@@ -169,20 +175,25 @@ export async function prepareOpenCodeRuntimeConfig(input: {
   const runtimeConfigHome = await fs.mkdtemp(path.join(os.tmpdir(), "paperclip-opencode-config-"));
   const runtimeConfigDir = path.join(runtimeConfigHome, "opencode");
   const runtimeConfigPath = path.join(runtimeConfigDir, "opencode.json");
+  const removeRuntimeConfigHome = async () => {
+    await fs.rm(runtimeConfigHome, { recursive: true, force: true });
+  };
 
-  await fs.mkdir(runtimeConfigDir, { recursive: true });
   try {
-    await fs.cp(sourceConfigDir, runtimeConfigDir, {
-      recursive: true,
-      force: true,
-      errorOnExist: false,
-      dereference: false,
-    });
-  } catch (err) {
-    if ((err as NodeJS.ErrnoException | null)?.code !== "ENOENT") {
-      throw err;
+    await fs.mkdir(runtimeConfigDir, { recursive: true });
+    try {
+      await fs.cp(sourceConfigDir, runtimeConfigDir, {
+        recursive: true,
+        force: true,
+        errorOnExist: false,
+        dereference: false,
+        filter: shouldCopyOpenCodeConfigPath,
+      });
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException | null)?.code !== "ENOENT") {
+        throw err;
+      }
     }
-  }
 
   const existingConfig = await readJsonObject(runtimeConfigPath);
   const notes = [
@@ -294,10 +305,12 @@ export async function prepareOpenCodeRuntimeConfig(input: {
       XDG_CONFIG_HOME: runtimeConfigHome,
     },
     notes,
-    cleanup: async () => {
-      await fs.rm(runtimeConfigHome, { recursive: true, force: true });
-    },
+    cleanup: removeRuntimeConfigHome,
   };
+  } catch (err) {
+    await removeRuntimeConfigHome().catch(() => undefined);
+    throw err;
+  }
 }
 
 /** Managed credentials must never leave host-only homes in a remote process. */

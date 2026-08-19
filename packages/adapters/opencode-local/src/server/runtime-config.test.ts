@@ -328,6 +328,48 @@ describe("prepareOpenCodeRuntimeConfig", () => {
     await prepared.cleanup();
   });
 
+  it("does not copy node_modules from the source OpenCode config", async () => {
+    const configHome = await makeConfigHome({ permission: { read: "allow" } });
+    const nested = path.join(configHome, "opencode", "node_modules", "@opencode-ai", "sdk");
+    await fs.mkdir(nested, { recursive: true });
+    await fs.writeFile(path.join(nested, "index.js"), "export {}\n", "utf8");
+
+    const prepared = await prepareOpenCodeRuntimeConfig({
+      env: { XDG_CONFIG_HOME: configHome },
+      config: {},
+    });
+    cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
+
+    await expect(
+      fs.access(path.join(prepared.env.XDG_CONFIG_HOME, "opencode", "opencode.json")),
+    ).resolves.toBeUndefined();
+    await expect(
+      fs.access(path.join(prepared.env.XDG_CONFIG_HOME, "opencode", "node_modules")),
+    ).rejects.toThrow();
+
+    await prepared.cleanup();
+  });
+
+  it("removes the temp config home if runtime config write fails", async () => {
+    const configHome = await makeConfigHome({ permission: { read: "allow" } });
+    const runtimeDir = path.join(configHome, "opencode", "opencode.json");
+    await fs.rm(runtimeDir, { force: true });
+    await fs.mkdir(runtimeDir, { recursive: true });
+
+    const before = await fs.readdir(os.tmpdir());
+    await expect(
+      prepareOpenCodeRuntimeConfig({
+        env: { XDG_CONFIG_HOME: configHome },
+        config: {},
+      }),
+    ).rejects.toThrow();
+    const after = await fs.readdir(os.tmpdir());
+    const leaked = after.filter(
+      (name) => name.startsWith("paperclip-opencode-config-") && !before.includes(name),
+    );
+    expect(leaked).toEqual([]);
+  });
+
   it("respects explicit opt-out", async () => {
     const configHome = await makeConfigHome();
     const prepared = await prepareOpenCodeRuntimeConfig({
