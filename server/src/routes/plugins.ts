@@ -31,6 +31,7 @@ import {
   agents,
   companies,
   heartbeatRuns,
+  pluginConfig,
   pluginLogs,
   pluginWebhookDeliveries,
   projects,
@@ -2739,6 +2740,18 @@ export function pluginRoutes(
       return;
     }
 
+    // Slack url_verification handshake — must echo back the challenge value
+    // before any DB write or worker dispatch so Slack accepts the endpoint.
+    if (
+      req.body &&
+      typeof req.body === "object" &&
+      (req.body as Record<string, unknown>).type === "url_verification"
+    ) {
+      const challenge = (req.body as Record<string, unknown>).challenge;
+      res.status(200).json({ challenge });
+      return;
+    }
+
     // Step 5: Extract request data
     const requestId = randomUUID();
     const rawHeaders: Record<string, string> = {};
@@ -2773,6 +2786,22 @@ export function pluginRoutes(
       .returning({ id: pluginWebhookDeliveries.id });
 
     // Step 7: Dispatch to the worker via handleWebhook RPC
+    // Resolve a companyId for the invocation scope so the plugin worker can
+    // call company-scoped APIs (e.g. ctx.secrets, ctx.events.emit) without a
+    // "company context is required" error. We take the first company that has
+    // this plugin configured; for single-tenant plugins this is unambiguous.
+    let webhookInvocationCompanyId: string | undefined;
+    try {
+      const [firstConfig] = await db
+        .select({ companyId: pluginConfig.companyId })
+        .from(pluginConfig)
+        .where(eq(pluginConfig.pluginId, plugin.id))
+        .limit(1);
+      webhookInvocationCompanyId = firstConfig?.companyId;
+    } catch {
+      // non-fatal — fall back to no company scope
+    }
+
     try {
       await webhookDeps.workerManager.call(plugin.id, "handleWebhook", {
         endpointKey,
@@ -2780,6 +2809,7 @@ export function pluginRoutes(
         rawBody,
         parsedBody,
         requestId,
+        companyId: webhookInvocationCompanyId,
       });
 
       // Step 8: Update delivery record to success

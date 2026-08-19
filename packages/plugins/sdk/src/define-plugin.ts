@@ -155,6 +155,12 @@ export interface PluginWebhookInput {
   parsedBody?: unknown;
   /** Unique request identifier for idempotency checks. */
   requestId: string;
+  /**
+   * Company to run this webhook handler under. When set, the worker receives a
+   * company-scoped invocation context so it can call APIs like `ctx.secrets`
+   * and `ctx.events.emit` without a "company context is required" error.
+   */
+  companyId?: string;
 }
 
 export interface PluginApiRequestInput {

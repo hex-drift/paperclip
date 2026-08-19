@@ -11,6 +11,7 @@
 import Ajv, { type ErrorObject } from "ajv";
 import addFormats from "ajv-formats";
 import type { JsonSchema } from "@paperclipai/shared";
+import { collectSecretRefPaths, parseSecretRefBindingObject } from "./json-schema-secret-refs.js";
 
 export interface ConfigValidationResult {
   valid: boolean;
@@ -38,8 +39,26 @@ export function validateInstanceConfig(
   // hold a Paperclip secret UUID rather than a raw value. The format is a UI
   // hint only — UUID validation happens in the secrets handler at resolve time.
   ajv.addFormat("secret-ref", { validate: () => true });
+
+  // Normalize secret-ref fields: the UI submits `{ type: "secret_ref", secretId, version? }`
+  // objects for `format: "secret-ref"` fields, but the schema declares them as
+  // `type: "string"`. Replace binding objects with the secretId string so Ajv
+  // validates the correct type.
+  const secretRefPaths = collectSecretRefPaths(schema as Record<string, unknown>);
+  const normalizedConfig: Record<string, unknown> = { ...configJson };
+  for (const path of secretRefPaths) {
+    const parts = path.split(".");
+    if (parts.length === 1) {
+      const val = normalizedConfig[parts[0]];
+      const parsed = parseSecretRefBindingObject(val);
+      if (parsed) {
+        normalizedConfig[parts[0]] = parsed.secretId;
+      }
+    }
+  }
+
   const validate = ajv.compile(schema);
-  const valid = validate(configJson);
+  const valid = validate(normalizedConfig);
 
   if (valid) {
     return { valid: true };
