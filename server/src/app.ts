@@ -537,6 +537,11 @@ export async function createApp(
       verify: captureRawBody,
     }),
   );
+  app.use(express.urlencoded({
+    extended: false,
+    limit: DEFAULT_JSON_BODY_LIMIT,
+    verify: captureRawBody,
+  }));
   app.use("/api", apiCompression());
   app.use(httpLogger);
   const privateHostnameGateEnabled = shouldEnablePrivateHostnameGuard({

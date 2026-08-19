@@ -2788,16 +2788,23 @@ export function pluginRoutes(
     // Step 7: Dispatch to the worker via handleWebhook RPC
     // Resolve a companyId for the invocation scope so the plugin worker can
     // call company-scoped APIs (e.g. ctx.secrets, ctx.events.emit) without a
-    // "company context is required" error. We take the first company that has
-    // this plugin configured; for single-tenant plugins this is unambiguous.
+    // "company context is required" error. When multiple companies have this
+    // plugin installed, prefer the one with a non-empty config (e.g. Slack
+    // token refs); otherwise fall back to the first row.
     let webhookInvocationCompanyId: string | undefined;
     try {
-      const [firstConfig] = await db
-        .select({ companyId: pluginConfig.companyId })
+      const configs = await db
+        .select({
+          companyId: pluginConfig.companyId,
+          configJson: pluginConfig.configJson,
+        })
         .from(pluginConfig)
-        .where(eq(pluginConfig.pluginId, plugin.id))
-        .limit(1);
-      webhookInvocationCompanyId = firstConfig?.companyId;
+        .where(eq(pluginConfig.pluginId, plugin.id));
+      const configured = configs.find(
+        (row) => row.configJson && Object.keys(row.configJson).length > 0,
+      );
+      webhookInvocationCompanyId =
+        configured?.companyId ?? configs[0]?.companyId;
     } catch {
       // non-fatal — fall back to no company scope
     }

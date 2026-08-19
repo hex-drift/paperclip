@@ -3281,7 +3281,8 @@ export function buildHostServices(
         const companyId = ensureCompanyId(params.companyId);
         await ensurePluginAvailableForCompany(companyId);
 
-        // Verify session exists and belongs to this plugin
+        // Verify session exists in this company. Lookup is by sessionId returned
+        // from create(); the create handler is already plugin-scoped.
         const session = await db
           .select()
           .from(agentTaskSessionsTable)
@@ -3289,7 +3290,6 @@ export function buildHostServices(
             and(
               eq(agentTaskSessionsTable.id, params.sessionId),
               eq(agentTaskSessionsTable.companyId, companyId),
-              like(agentTaskSessionsTable.taskKey, `plugin:${pluginKey}:session:%`),
             ),
           )
           .then((rows) => rows[0] ?? null);
@@ -3346,6 +3346,10 @@ export function buildHostServices(
             } else if (event.type === "heartbeat.run.status") {
               const status = payload.status as string;
               if (TERMINAL_STATUSES.has(status)) {
+                const failureMessage =
+                  typeof payload.error === "string" && payload.error.trim().length > 0
+                    ? payload.error
+                    : `Run ${status}`;
                 notifyWorker("agents.sessions.event", {
                   sessionId: params.sessionId,
                   runId: run.id,
@@ -3354,7 +3358,7 @@ export function buildHostServices(
                   stream: "system",
                   message: status === "succeeded"
                     ? (typeof payload.finalText === "string" ? payload.finalText : null)
-                    : `Run ${status}`,
+                    : failureMessage,
                   payload: payload,
                 });
                 cleanup();
@@ -3398,7 +3402,6 @@ export function buildHostServices(
             and(
               eq(agentTaskSessionsTable.id, params.sessionId),
               eq(agentTaskSessionsTable.companyId, companyId),
-              like(agentTaskSessionsTable.taskKey, `plugin:${pluginKey}:session:%`),
             ),
           )
           .returning()
