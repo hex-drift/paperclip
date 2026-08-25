@@ -10,7 +10,9 @@
  * ## Responsibilities
  *
  * 1. **Tick loop** — A `setInterval`-based loop fires every `tickIntervalMs`
- *    (default 30s). Each tick scans for due jobs and dispatches them.
+ *    (default 30s). Each tick scans for due jobs (oldest `nextRunAt` first,
+ *    bounded) and dispatches them up to the concurrency cap. Skipped overdue
+ *    rows keep their `nextRunAt` and rise to the front on later ticks.
  *
  * 2. **Cron parsing & next-run calculation** — Uses the lightweight built-in
  *    cron parser ({@link parseCron}, {@link nextCronTick}) to compute the
@@ -34,7 +36,7 @@
  * @see ./cron.ts — Cron parsing utilities
  */
 
-import { and, eq, lte, or } from "drizzle-orm";
+import { and, asc, eq, lte, or } from "drizzle-orm";
 import type { Db } from "@paperclipai/db";
 import { pluginJobs, pluginJobRuns } from "@paperclipai/db";
 import type { PluginJobStore } from "./plugin-job-store.js";
@@ -258,8 +260,10 @@ export function createPluginJobScheduler(
       const now = new Date();
 
       // Query for jobs whose nextRunAt has passed and are active.
-      // We include jobs with null nextRunAt since they may have just been
-      // registered and need their first run calculated.
+      // Oldest-due first so a row skipped by the concurrency cap becomes more
+      // overdue and rises to the front on the next tick (no permanent starvation).
+      // Bound the result set: unordered full-table scans + break-at-cap used to
+      // strand a stable tail of rows forever once due jobs exceeded the cap.
       const dueJobs = await db
         .select()
         .from(pluginJobs)
@@ -268,7 +272,9 @@ export function createPluginJobScheduler(
             eq(pluginJobs.status, "active"),
             lte(pluginJobs.nextRunAt, now),
           ),
-        );
+        )
+        .orderBy(asc(pluginJobs.nextRunAt))
+        .limit(maxConcurrentJobs * 2);
 
       if (dueJobs.length === 0) {
         return;
@@ -279,12 +285,22 @@ export function createPluginJobScheduler(
       // Dispatch each due job (respecting concurrency limits)
       const dispatches: Promise<void>[] = [];
 
-      for (const job of dueJobs) {
+      for (let i = 0; i < dueJobs.length; i++) {
+        const job = dueJobs[i]!;
         // Concurrency limit
         if (activeJobs.size >= maxConcurrentJobs) {
+          const skipped = dueJobs.length - i;
+          const oldestSkipped = dueJobs[i]!;
           log.warn(
-            { maxConcurrentJobs, activeJobCount: activeJobs.size },
-            "max concurrent jobs reached, deferring remaining jobs",
+            {
+              maxConcurrentJobs,
+              activeJobCount: activeJobs.size,
+              skippedDueJobs: skipped,
+              oldestSkippedNextRunAt: oldestSkipped.nextRunAt?.toISOString() ?? null,
+              oldestSkippedJobKey: oldestSkipped.jobKey,
+              oldestSkippedPluginId: oldestSkipped.pluginId,
+            },
+            "max concurrent jobs reached, skipping due jobs this pass",
           );
           break;
         }
