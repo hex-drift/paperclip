@@ -59,11 +59,13 @@ export function sequentialThinkingAcpServer(): {
   name: string;
   command: string;
   args: string[];
+  env: Array<{ name: string; value: string }>;
 } {
   return {
     type: "stdio",
     name: SEQUENTIAL_THINKING_MCP_NAME,
     command: SEQUENTIAL_THINKING_MCP_COMMAND,
     args: [...SEQUENTIAL_THINKING_MCP_ARGS],
+    env: [],
   };
 }
