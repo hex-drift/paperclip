@@ -313,6 +313,19 @@ function agentActor(agentId = "22222222-2222-4222-8222-222222222222") {
   };
 }
 
+function taskBridgeActor(options: { runId?: string } = {}) {
+  return {
+    ...agentActor(),
+    keyId: "99999999-9999-4999-8999-999999999999",
+    keyScope: {
+      kind: "task_bridge",
+      projectId: "88888888-8888-4888-8888-888888888888",
+      allowedAssigneeAgentIds: ["22222222-2222-4222-8222-222222222222"],
+    },
+    runId: options.runId,
+  };
+}
+
 async function waitForWakeup(assertion: () => void) {
   await vi.waitFor(assertion);
 }
@@ -2634,6 +2647,77 @@ describe.sequential("issue comment reopen routes", () => {
       expect(mockIssueService.addComment).not.toHaveBeenCalled();
     },
   );
+
+  it.each([
+    ["comment", (app: express.Express) => request(app)
+      .post("/api/issues/11111111-1111-4111-8111-111111111111/comments")
+      .send({ body: "bridge follow-up" })],
+    ["update", (app: express.Express) => request(app)
+      .patch("/api/issues/11111111-1111-4111-8111-111111111111")
+      .send({ title: "Bridge-owned update" })],
+  ] as const)("allows an authorized runless task-bridge %s after the exact issue boundary passes", async (kind, sendRequest) => {
+    const existing = makeIssue("todo");
+    mockIssueService.getById.mockResolvedValue(existing);
+    mockIssueService.update.mockImplementation(async (_id: string, patch: Record<string, unknown>) => ({
+      ...existing,
+      ...patch,
+    }));
+
+    const res = await sendRequest(await installActor(createApp(), taskBridgeActor()));
+
+    expect(res.status, JSON.stringify(res.body)).toBe(kind === "comment" ? 201 : 200);
+    expect(mockObserveCrossIssueInfluence).not.toHaveBeenCalled();
+    if (kind === "comment") expect(mockIssueService.addComment).toHaveBeenCalledOnce();
+    else expect(mockIssueService.update).toHaveBeenCalledOnce();
+  });
+
+  it.each([
+    ["comment", (app: express.Express) => request(app)
+      .post("/api/issues/11111111-1111-4111-8111-111111111111/comments")
+      .send({ body: "out-of-boundary bridge follow-up" })],
+    ["update", (app: express.Express) => request(app)
+      .patch("/api/issues/11111111-1111-4111-8111-111111111111")
+      .send({ title: "Out-of-boundary bridge update" })],
+  ] as const)("denies a runless task-bridge %s before considering the runless exception when the issue boundary fails", async (_kind, sendRequest) => {
+    mockIssueService.getById.mockResolvedValue(makeIssue("todo"));
+    mockAccessService.decide.mockImplementation(async (input: { action?: string }) => ({
+      allowed: false,
+      action: input.action,
+      reason: "deny_scope",
+      explanation: "Task bridge key can only access assigned or bridge-created issues.",
+    }));
+
+    const res = await sendRequest(await installActor(createApp(), taskBridgeActor()));
+
+    expect(res.status).toBe(403);
+    expect(mockObserveCrossIssueInfluence).not.toHaveBeenCalled();
+    expect(mockIssueService.update).not.toHaveBeenCalled();
+    expect(mockIssueService.addComment).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["comment", (app: express.Express) => request(app)
+      .post("/api/issues/11111111-1111-4111-8111-111111111111/comments")
+      .send({ body: "bridge follow-up with bad run" })],
+    ["update", (app: express.Express) => request(app)
+      .patch("/api/issues/11111111-1111-4111-8111-111111111111")
+      .send({ title: "Bridge update with bad run" })],
+  ] as const)("still validates a supplied task-bridge run id for %s writes", async (_kind, sendRequest) => {
+    mockIssueService.getById.mockResolvedValue(makeIssue("todo"));
+    mockObserveCrossIssueInfluence.mockRejectedValue(new HttpError(
+      403,
+      "Agent issue comments and updates require a valid heartbeat run so cross-issue influence can be contained",
+      { code: "cross_issue_influence_run_context_required" },
+    ));
+
+    const res = await sendRequest(await installActor(createApp(), taskBridgeActor({ runId: "invalid-run" })));
+
+    expect(res.status).toBe(403);
+    expect(res.body.details).toEqual({ code: "cross_issue_influence_run_context_required" });
+    expect(mockObserveCrossIssueInfluence).toHaveBeenCalledOnce();
+    expect(mockIssueService.update).not.toHaveBeenCalled();
+    expect(mockIssueService.addComment).not.toHaveBeenCalled();
+  });
 
   it.each(["invalid", "wrong agent", "wrong company"])(
     "rejects comment and PATCH writes with a %s run",

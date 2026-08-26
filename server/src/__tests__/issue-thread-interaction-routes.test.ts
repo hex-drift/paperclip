@@ -3159,6 +3159,36 @@ describe.sequential("issue thread interaction routes", () => {
     expect(toolAction.body).toMatchObject({ code: "interaction_governed_action_denied" });
   });
 
+  it("does not extend the runless task-bridge write exception to interaction resolution", async () => {
+    mockInteractionService.getForIssue.mockResolvedValueOnce({
+      id: "interaction-runless-task-bridge",
+      kind: "ask_user_questions",
+      status: "pending",
+      createdByAgentId: CREATED_AGENT_ID,
+      sourceRunId: "run-1",
+      requestedResolverPolicy: "anyone",
+      effectiveResolverPolicy: "anyone",
+      payload: { version: 1, questions: [] },
+    });
+    const app = await createApp({
+      type: "agent",
+      agentId: ASSIGNEE_AGENT_ID,
+      companyId: "company-1",
+      source: "agent_key",
+      keyId: "bridge-key",
+      keyScope: { kind: "task_bridge", projectId: "project-1" },
+    });
+
+    const res = await request(app)
+      .post("/api/issues/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/interactions/interaction-runless-task-bridge/respond")
+      .send({ answers: [] });
+
+    expect(res.status).toBe(401);
+    expect(mockInteractionService.getForIssue).not.toHaveBeenCalled();
+    expect(mockInteractionService.answerQuestions).not.toHaveBeenCalled();
+    expect(mockHeartbeatService.wakeup).not.toHaveBeenCalled();
+  });
+
   it("lets watchdog-scoped agents use the ordinary resolver and contains low-trust agents", async () => {
     mockIssueService.getById.mockResolvedValue(createIssue({ status: "todo" }));
     const actor = {
