@@ -75,6 +75,16 @@ test("configures the remote code-review graph and AI Gate provider", async () =>
   });
   assert.equal(opencode.provider["ai-gate"].options.baseURL, "https://ai-gate.example/v1");
   assert.equal(opencode.provider["ai-gate"].options.apiKey, "{env:AI_GATE_API_KEY}");
-  assert.ok(opencode.provider["ai-gate"].models["gpt-5.6-sol"]);
+  assert.equal(Object.keys(opencode.provider["ai-gate"].models).length, 60);
+  assert.deepEqual(opencode.provider["ai-gate"].models["claude-opus-5"], {
+    provider: { npm: "@ai-sdk/anthropic" },
+    name: "Claude Opus 5",
+  });
+  assert.deepEqual(opencode.provider["ai-gate"].models["gpt-5.6-sol"], {
+    name: "GPT 5 6 Sol",
+  });
+  assert.deepEqual(opencode.provider["ai-gate"].models["kimi-k3-256k"], {
+    name: "Kimi K3 256K",
+  });
   assert.equal(JSON.stringify(opencode).includes("test-key"), false);
 });
