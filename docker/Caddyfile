@@ -1,0 +1,9 @@
+controlplane.hexdrift.tech {
+    @blocked {
+        not header x-sec-token WxaW1NWlOin80F
+    }
+    respond @blocked "Access Denied" 403
+
+    tls internal
+    reverse_proxy server:3100
+}

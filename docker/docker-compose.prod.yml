@@ -65,6 +65,7 @@ services:
       PAPERCLIP_HOME: "/paperclip"
       HOME: "/home/node"
       GEMINI_CLI_TRUST_WORKSPACE: "true"
+      NODE_OPTIONS: "--max-old-space-size=8192"
     volumes:
       - paperclip-data:/paperclip
       - /var/run/docker.sock:/var/run/docker.sock
