@@ -75,7 +75,7 @@ test("configures the remote code-review graph and AI Gate provider", async () =>
   });
   assert.equal(opencode.provider["ai-gate"].options.baseURL, "https://ai-gate.example/v1");
   assert.equal(opencode.provider["ai-gate"].options.apiKey, "{env:AI_GATE_API_KEY}");
-  assert.equal(Object.keys(opencode.provider["ai-gate"].models).length, 60);
+  assert.equal(Object.keys(opencode.provider["ai-gate"].models).length, 20);
   assert.deepEqual(opencode.provider["ai-gate"].models["claude-opus-5"], {
     provider: { npm: "@ai-sdk/anthropic" },
     name: "Claude Opus 5",
