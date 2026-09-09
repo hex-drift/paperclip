@@ -120,12 +120,44 @@ function parseMcpConfig(
   return Object.keys(servers).length > 0 ? servers : null;
 }
 
+const AI_GATE_PROVIDER_ID = "ai-gate";
+
 function parseConfiguredModelRef(raw: unknown): { provider: string; model: string } | null {
   if (typeof raw !== "string") return null;
   const trimmed = raw.trim();
   const slash = trimmed.indexOf("/");
   if (slash <= 0 || slash === trimmed.length - 1) return null;
   return { provider: trimmed.slice(0, slash), model: trimmed.slice(slash + 1) };
+}
+
+function readAiGateApiKeyOverride(env: Record<string, string>): string | null {
+  const value = env.AI_GATE_API_KEY;
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+/** Apply a per-agent AI Gate key without touching the instance-wide OpenCode login. */
+function applyAiGateApiKeyOverride(
+  nextProvider: Record<string, unknown>,
+  env: Record<string, string>,
+  configuredModel: { provider: string; model: string } | null,
+  notes: string[],
+): Record<string, unknown> {
+  const overrideKey = readAiGateApiKeyOverride(env);
+  if (!overrideKey) return nextProvider;
+  if (!configuredModel || configuredModel.provider !== AI_GATE_PROVIDER_ID) return nextProvider;
+
+  const providerEntry = isPlainObject(nextProvider[AI_GATE_PROVIDER_ID])
+    ? { ...(nextProvider[AI_GATE_PROVIDER_ID] as Record<string, unknown>) }
+    : {};
+  const options = isPlainObject(providerEntry.options)
+    ? { ...(providerEntry.options as Record<string, unknown>) }
+    : {};
+  options.apiKey = overrideKey;
+  providerEntry.options = options;
+  notes.push("Overrode ai-gate provider apiKey from agent AI_GATE_API_KEY.");
+  return { ...nextProvider, [AI_GATE_PROVIDER_ID]: providerEntry };
 }
 
 /** Heavy install trees do not belong in the per-run XDG copy under /tmp. */
@@ -248,6 +280,8 @@ export async function prepareOpenCodeRuntimeConfig(input: {
       );
     }
   }
+
+  nextProvider = applyAiGateApiKeyOverride(nextProvider, input.env, configuredModel, notes);
 
   const nextConfig: Record<string, unknown> = {
     ...existingConfig,

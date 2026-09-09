@@ -370,6 +370,146 @@ describe("prepareOpenCodeRuntimeConfig", () => {
     expect(leaked).toEqual([]);
   });
 
+  it("overrides ai-gate apiKey from agent AI_GATE_API_KEY when the model is ai-gate/*", async () => {
+    const configHome = await makeConfigHome({
+      provider: {
+        "ai-gate": {
+          npm: "@ai-sdk/openai-compatible",
+          options: { baseURL: "https://ai-gate.example/v1" },
+          models: { "gpt-5.6-luna": { name: "GPT-5.6 Luna" } },
+        },
+      },
+    });
+    const prepared = await prepareOpenCodeRuntimeConfig({
+      env: { XDG_CONFIG_HOME: configHome, AI_GATE_API_KEY: "sk-cpa-agent" },
+      config: { model: "ai-gate/gpt-5.6-luna" },
+    });
+    cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
+    const runtimeConfig = JSON.parse(
+      await fs.readFile(path.join(prepared.env.XDG_CONFIG_HOME, "opencode", "opencode.json"), "utf8"),
+    ) as { provider: { "ai-gate": { options: { apiKey?: string; baseURL?: string } } } };
+    expect(runtimeConfig.provider["ai-gate"].options.apiKey).toBe("sk-cpa-agent");
+    expect(runtimeConfig.provider["ai-gate"].options.baseURL).toBe("https://ai-gate.example/v1");
+    expect(prepared.notes).toContain("Overrode ai-gate provider apiKey from agent AI_GATE_API_KEY.");
+    await prepared.cleanup();
+  });
+
+  it("does not override ai-gate apiKey when AI_GATE_API_KEY is absent (global login stays)", async () => {
+    const configHome = await makeConfigHome({
+      provider: {
+        "ai-gate": {
+          options: { baseURL: "https://ai-gate.example/v1" },
+          models: { "gpt-5.6-luna": {} },
+        },
+      },
+    });
+    const prepared = await prepareOpenCodeRuntimeConfig({
+      env: { XDG_CONFIG_HOME: configHome },
+      config: { model: "ai-gate/gpt-5.6-luna" },
+    });
+    cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
+    const runtimeConfig = JSON.parse(
+      await fs.readFile(path.join(prepared.env.XDG_CONFIG_HOME, "opencode", "opencode.json"), "utf8"),
+    ) as { provider: { "ai-gate": { options: { apiKey?: string } } } };
+    expect(runtimeConfig.provider["ai-gate"].options.apiKey).toBeUndefined();
+    expect(prepared.notes.some((note) => note.includes("AI_GATE_API_KEY"))).toBe(false);
+    await prepared.cleanup();
+  });
+
+  it("does not treat process.env.AI_GATE_API_KEY as an agent override", async () => {
+    const configHome = await makeConfigHome({
+      provider: {
+        "ai-gate": {
+          options: { baseURL: "https://ai-gate.example/v1" },
+          models: { "gpt-5.6-luna": {} },
+        },
+      },
+    });
+    process.env.AI_GATE_API_KEY = "sk-cpa-global";
+    try {
+      const prepared = await prepareOpenCodeRuntimeConfig({
+        env: { XDG_CONFIG_HOME: configHome },
+        config: { model: "ai-gate/gpt-5.6-luna" },
+      });
+      cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
+      const runtimeConfig = JSON.parse(
+        await fs.readFile(path.join(prepared.env.XDG_CONFIG_HOME, "opencode", "opencode.json"), "utf8"),
+      ) as { provider: { "ai-gate": { options: { apiKey?: string } } } };
+      expect(runtimeConfig.provider["ai-gate"].options.apiKey).toBeUndefined();
+      await prepared.cleanup();
+    } finally {
+      delete process.env.AI_GATE_API_KEY;
+    }
+  });
+
+  it("does not override ai-gate when AI_GATE_API_KEY is set but the model is another provider", async () => {
+    const configHome = await makeConfigHome({
+      provider: {
+        "ai-gate": {
+          options: { baseURL: "https://ai-gate.example/v1", apiKey: "sk-cpa-global" },
+          models: { "gpt-5.6-luna": {} },
+        },
+      },
+    });
+    const prepared = await prepareOpenCodeRuntimeConfig({
+      env: { XDG_CONFIG_HOME: configHome, AI_GATE_API_KEY: "sk-cpa-agent" },
+      config: { model: "openai/gpt-5.2-codex" },
+    });
+    cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
+    const runtimeConfig = JSON.parse(
+      await fs.readFile(path.join(prepared.env.XDG_CONFIG_HOME, "opencode", "opencode.json"), "utf8"),
+    ) as { provider: { "ai-gate": { options: { apiKey?: string } } } };
+    expect(runtimeConfig.provider["ai-gate"].options.apiKey).toBe("sk-cpa-global");
+    expect(prepared.notes.some((note) => note.includes("AI_GATE_API_KEY"))).toBe(false);
+    await prepared.cleanup();
+  });
+
+  it("ignores blank AI_GATE_API_KEY so the global login stays", async () => {
+    const configHome = await makeConfigHome({
+      provider: {
+        "ai-gate": {
+          options: { baseURL: "https://ai-gate.example/v1" },
+          models: { "gpt-5.6-luna": {} },
+        },
+      },
+    });
+    const prepared = await prepareOpenCodeRuntimeConfig({
+      env: { XDG_CONFIG_HOME: configHome, AI_GATE_API_KEY: "   " },
+      config: { model: "ai-gate/gpt-5.6-luna" },
+    });
+    cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
+    const runtimeConfig = JSON.parse(
+      await fs.readFile(path.join(prepared.env.XDG_CONFIG_HOME, "opencode", "opencode.json"), "utf8"),
+    ) as { provider: { "ai-gate": { options: { apiKey?: string } } } };
+    expect(runtimeConfig.provider["ai-gate"].options.apiKey).toBeUndefined();
+    await prepared.cleanup();
+  });
+
+  it("lets agent AI_GATE_API_KEY replace a gateway provider key baked from PAPERCLIP_OPENCODE_PROVIDERS", async () => {
+    const configHome = await makeConfigHome({ permission: { read: "allow" } });
+    const providers = {
+      "ai-gate": {
+        options: { baseURL: "https://ai-gate.example/v1", apiKey: "{env:OPENROUTER_API_KEY}" },
+        models: { "gpt-5.6-luna": {} },
+      },
+    };
+    const prepared = await prepareOpenCodeRuntimeConfig({
+      env: {
+        XDG_CONFIG_HOME: configHome,
+        PAPERCLIP_OPENCODE_PROVIDERS: JSON.stringify(providers),
+        OPENROUTER_API_KEY: "sk-or-global",
+        AI_GATE_API_KEY: "sk-cpa-agent",
+      },
+      config: { model: "ai-gate/gpt-5.6-luna" },
+    });
+    cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
+    const runtimeConfig = JSON.parse(
+      await fs.readFile(path.join(prepared.env.XDG_CONFIG_HOME, "opencode", "opencode.json"), "utf8"),
+    ) as { provider: { "ai-gate": { options: { apiKey?: string } } } };
+    expect(runtimeConfig.provider["ai-gate"].options.apiKey).toBe("sk-cpa-agent");
+    await prepared.cleanup();
+  });
+
   it("respects explicit opt-out", async () => {
     const configHome = await makeConfigHome();
     const prepared = await prepareOpenCodeRuntimeConfig({
