@@ -24,6 +24,7 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
+    restart: unless-stopped
     logging: *default-logging
     user: root
     expose:
