@@ -96,7 +96,7 @@ Core fields:
 - promptTemplate (string, optional): run prompt template
 - command (string, optional): defaults to "opencode"
 - extraArgs (string[], optional): additional CLI args
-- env (object, optional): KEY=VALUE environment variables
+- env (object, optional): KEY=VALUE environment variables. If \`AI_GATE_API_KEY\` is set and the selected model is \`ai-gate/...\`, Paperclip writes that key into the runtime OpenCode \`ai-gate\` provider. Agents without that env keep the instance-wide AI Gate login.
 
 Operational fields:
 - timeoutSec (number, optional): run timeout in seconds
