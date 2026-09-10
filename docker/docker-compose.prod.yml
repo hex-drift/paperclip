@@ -71,6 +71,9 @@ services:
       - paperclip-data:/paperclip
       - /var/run/docker.sock:/var/run/docker.sock
       - paperclip-worker-home:/home/node
+      # MIA dashboard trusted launcher (process adapter runs in this container).
+      # Host path is immutable per-hash; isolation of process-host is a follow-up.
+      - /opt/dashboard-runner/current:/dashboard-runner:ro
     entrypoint: ["/bin/sh", "-c"]
     command: >
       "
