@@ -42,7 +42,7 @@ export const SANDBOX_INSTALL_COMMAND =
   'fi; ' +
   'fi';
 
-export const DEFAULT_OPENCODE_LOCAL_MODEL = "openai/gpt-5.2-codex";
+export const DEFAULT_OPENCODE_LOCAL_MODEL = "ai-gate/gpt-5.6-luna";
 
 export function isValidOpenCodeModelId(value: unknown): value is string {
   if (typeof value !== "string") return false;
@@ -65,6 +65,7 @@ export const models: Array<{ id: string; label: string }> = [
   { id: "anthropic/claude-sonnet-5", label: "anthropic/claude-sonnet-5" },
   { id: "google/gemini-3.8-flash", label: "google/gemini-3.8-flash" },
   { id: "xai/grok-4.7", label: "xai/grok-4.7" },
+  { id: "openai/gpt-5.2-codex", label: "openai/gpt-5.2-codex" },
   { id: "openai/gpt-5.5", label: "openai/gpt-5.5" },
   { id: "openai/gpt-5.4", label: "openai/gpt-5.4" },
   { id: "openai/gpt-5.4-mini", label: "openai/gpt-5.4-mini" },
