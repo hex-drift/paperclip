@@ -2524,35 +2524,49 @@ export function routineService(
       const existing = await getTriggerById(id);
       if (!existing) return null;
 
-      let nextRunAt = existing.nextRunAt;
-      let cronExpression = existing.cronExpression;
-      let timezone = existing.timezone;
-
       if (existing.kind === "schedule") {
-        const routine = await getRoutineById(existing.routineId);
-        if (!routine) throw notFound("Routine not found");
         if (patch.cronExpression !== undefined) {
           if (patch.cronExpression == null) throw unprocessable("Scheduled triggers require cronExpression");
           const error = validateCron(patch.cronExpression);
           if (error) throw unprocessable(error);
-          cronExpression = patch.cronExpression;
         }
         if (patch.timezone !== undefined) {
           if (patch.timezone == null) throw unprocessable("Scheduled triggers require timezone");
           assertTimeZone(patch.timezone);
-          timezone = patch.timezone;
-        }
-        if (cronExpression && timezone) {
-          nextRunAt = nextCronTickInTimeZone(cronExpression, timezone, new Date());
-        }
-        if ((patch.enabled ?? existing.enabled) === true) {
-          assertScheduleCompatibleVariables(routine.variables ?? []);
         }
       }
 
       const result = await db.transaction(async (tx) => {
         const txDb = tx as unknown as Db;
         await tx.execute(sql`select id from ${routines} where ${routines.id} = ${existing.routineId} for update`);
+        const routine = await txDb
+          .select()
+          .from(routines)
+          .where(eq(routines.id, existing.routineId))
+          .then((rows) => rows[0] ?? null);
+        if (!routine) throw notFound("Routine not found");
+
+        if (patch.baseRevisionId && patch.baseRevisionId !== routine.latestRevisionId) {
+          throw conflict("Routine was updated by someone else", {
+            currentRevisionId: routine.latestRevisionId,
+          });
+        }
+
+        let nextRunAt = existing.nextRunAt;
+        let cronExpression = existing.cronExpression;
+        let timezone = existing.timezone;
+
+        if (existing.kind === "schedule") {
+          if (patch.cronExpression !== undefined) cronExpression = patch.cronExpression;
+          if (patch.timezone !== undefined) timezone = patch.timezone;
+          if (cronExpression && timezone) {
+            nextRunAt = nextCronTickInTimeZone(cronExpression, timezone, new Date());
+          }
+          if ((patch.enabled ?? existing.enabled) === true) {
+            assertScheduleCompatibleVariables(routine.variables ?? []);
+          }
+        }
+
         const [updated] = await txDb
           .update(routineTriggers)
           .set({
@@ -2572,12 +2586,6 @@ export function routineService(
           .where(eq(routineTriggers.id, id))
           .returning();
         if (!updated) return null;
-        const routine = await txDb
-          .select()
-          .from(routines)
-          .where(eq(routines.id, existing.routineId))
-          .then((rows) => rows[0] ?? null);
-        if (!routine) throw notFound("Routine not found");
         const appended = await appendRoutineRevision(txDb, routine, actor, {
           changeSummary: `Updated ${existing.kind} trigger`,
         });

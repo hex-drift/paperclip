@@ -148,9 +148,14 @@ A routine can have multiple triggers of different kinds.
 PATCH /api/routine-triggers/{triggerId}
 {
   "enabled": false,
-  "cronExpression": "0 10 * * 1"
+  "cronExpression": "0 10 * * 1",
+  "baseRevisionId": "{latestRevisionId}"
 }
 ```
+
+`baseRevisionId` is optional for backward compatibility. When provided, it is checked against `routines.latestRevisionId` inside the same transaction/lock as the trigger write. A stale value returns `409 Conflict` with `{ details: { currentRevisionId } }` and applies no trigger update, no `nextRunAt` recompute, and no new revision.
+
+On success the response is `{ trigger, revision }`. Without `baseRevisionId` there is no idempotency/precondition: a request the server already accepted can still apply after a client timeout or disconnect.
 
 ## Delete Trigger
 

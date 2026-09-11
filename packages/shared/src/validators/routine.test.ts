@@ -3,6 +3,7 @@ import {
   routineRevisionSnapshotV1Schema,
   routineVariableSchema,
   updateRoutineSchema,
+  updateRoutineTriggerSchema,
 } from "./routine.js";
 
 const routineId = "11111111-1111-4111-8111-111111111111";
@@ -83,6 +84,13 @@ describe("routine validators", () => {
   it("accepts optional base revision ids on routine updates", () => {
     expect(updateRoutineSchema.parse({
       title: "Daily triage",
+      baseRevisionId,
+    }).baseRevisionId).toBe(baseRevisionId);
+  });
+
+  it("accepts optional base revision ids on trigger updates", () => {
+    expect(updateRoutineTriggerSchema.parse({
+      enabled: false,
       baseRevisionId,
     }).baseRevisionId).toBe(baseRevisionId);
   });

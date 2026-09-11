@@ -24,6 +24,9 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
+      args:
+        PAPERCLIP_BUILD_COMMIT: ${PAPERCLIP_BUILD_COMMIT:-}
+        PAPERCLIP_BUILD_VERSION: ${PAPERCLIP_BUILD_VERSION:-}
     restart: unless-stopped
     logging: *default-logging
     user: root

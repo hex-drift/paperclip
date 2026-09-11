@@ -955,6 +955,48 @@ describeEmbeddedPostgres("routine service live-execution coalescing", () => {
     });
   });
 
+  it("rejects stale trigger baseRevisionId updates without writing trigger or revision", async () => {
+    const { routine, svc } = await seedFixture();
+    const created = await svc.createTrigger(routine.id, {
+      kind: "schedule",
+      cronExpression: "0 9 * * 1",
+      timezone: "UTC",
+    }, {});
+    const current = await svc.updateTrigger(created.trigger.id, {
+      label: "fresh",
+      baseRevisionId: created.revision.id,
+    }, {});
+    expect(current?.revision.id).toBeTruthy();
+    const nextRunAtBefore = current?.trigger.nextRunAt ?? null;
+    const revisionCountBefore = await db
+      .select({ id: routineRevisions.id })
+      .from(routineRevisions)
+      .where(eq(routineRevisions.routineId, routine.id));
+
+    await expect(
+      svc.updateTrigger(created.trigger.id, {
+        label: "stale trigger patch",
+        cronExpression: "0 10 * * 1",
+        baseRevisionId: created.revision.id,
+      }, {}),
+    ).rejects.toMatchObject({
+      status: 409,
+      details: {
+        currentRevisionId: current?.revision.id,
+      },
+    });
+
+    const unchanged = await svc.getTrigger(created.trigger.id);
+    expect(unchanged?.label).toBe("fresh");
+    expect(unchanged?.cronExpression).toBe("0 9 * * 1");
+    expect(unchanged?.nextRunAt?.getTime() ?? null).toBe(nextRunAtBefore?.getTime() ?? null);
+    const revisionCountAfter = await db
+      .select({ id: routineRevisions.id })
+      .from(routineRevisions)
+      .where(eq(routineRevisions.routineId, routine.id));
+    expect(revisionCountAfter).toHaveLength(revisionCountBefore.length);
+  });
+
   it("restores an older routine revision append-only and preserves run history", async () => {
     const { routine, svc } = await seedFixture();
     const revision1Id = routine.latestRevisionId!;

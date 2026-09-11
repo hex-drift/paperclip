@@ -4645,7 +4645,7 @@ registry.registerPath({
     params: z.object({ id: z.string() }),
     body: jsonBody(updateRoutineTriggerSchema),
   },
-  responses: { 200: r.ok(), 400: r.badRequest, 401: r.unauthorized },
+  responses: { 200: r.ok(), 400: r.badRequest, 401: r.unauthorized, 404: r.notFound, 409: r.conflict },
 });
 
 registry.registerPath({

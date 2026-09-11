@@ -164,6 +164,7 @@ export const updateRoutineTriggerSchema = z.object({
   timezone: z.string().trim().min(1).optional().nullable(),
   signingMode: z.enum(ROUTINE_TRIGGER_SIGNING_MODES).optional().nullable(),
   replayWindowSec: z.number().int().min(30).max(86_400).optional().nullable(),
+  baseRevisionId: z.string().guid().optional().nullable(),
 });
 
 export type UpdateRoutineTrigger = z.infer<typeof updateRoutineTriggerSchema>;
