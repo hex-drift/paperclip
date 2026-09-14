@@ -1263,7 +1263,8 @@ Per-agent schedule fields in `adapter_config`:
 
 - `enabled` boolean
 - `intervalSec` integer (minimum 30)
-- `maxConcurrentRuns` integer; new agents default to `20`; scheduler clamps configured values to `1..50`
+- `maxConcurrentRuns` integer; new agents default to `1`; scheduler clamps configured values to `1..50`
+- instance-wide host-process cap: at most `PAPERCLIP_MAX_CONCURRENT_HOST_RUNS` concurrent heartbeat runs whose adapters spawn on the Paperclip host (default `8`; `0` disables). Remote adapters (`http`, `cursor_cloud`, `hermes_gateway`, `openclaw_gateway`) are excluded. Extra work stays `queued` and is promoted when a host slot frees.
 
 Scheduler must skip invocation when:
 

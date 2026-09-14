@@ -1,5 +1,6 @@
 import * as p from "@clack/prompts";
 import pc from "picocolors";
+import { INSTANCE_DEFAULT_MAX_CONCURRENT_HOST_RUNS } from "@paperclipai/shared";
 import type { PaperclipConfig } from "../config/schema.js";
 import { configExists, readConfig, resolveConfigPath } from "../config/store.js";
 import {
@@ -267,6 +268,13 @@ function collectDeploymentEnvRows(config: PaperclipConfig | null, configPath: st
       source: process.env.HEARTBEAT_SCHEDULER_ENABLED ? "env" : "default",
       required: false,
       note: "Set to `false` to disable timer scheduling",
+    },
+    {
+      key: "PAPERCLIP_MAX_CONCURRENT_HOST_RUNS",
+      value: process.env.PAPERCLIP_MAX_CONCURRENT_HOST_RUNS ?? String(INSTANCE_DEFAULT_MAX_CONCURRENT_HOST_RUNS),
+      source: process.env.PAPERCLIP_MAX_CONCURRENT_HOST_RUNS ? "env" : "default",
+      required: false,
+      note: "Instance cap on concurrent host-process heartbeat runs (local CLIs). `0` disables the cap.",
     },
     {
       key: "PAPERCLIP_SECRETS_PROVIDER",

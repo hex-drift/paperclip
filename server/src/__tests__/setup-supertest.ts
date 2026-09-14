@@ -38,6 +38,12 @@ if (!process.env.PAPERCLIP_MANAGED_RUNTIME_HTTPS) {
   process.env.PAPERCLIP_MANAGED_RUNTIME_HTTPS = "off";
 }
 
+// Instance host-run cap is a production safety default (8). Server tests that
+// are not specifically covering the cap should not serialize on it.
+if (process.env.PAPERCLIP_MAX_CONCURRENT_HOST_RUNS === undefined) {
+  process.env.PAPERCLIP_MAX_CONCURRENT_HOST_RUNS = "0";
+}
+
 if (!SupertestTest.prototype.__paperclipLoopbackPatched) {
   SupertestTest.prototype.serverAddress = function serverAddress(app, path) {
     const addr = app.address();

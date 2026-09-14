@@ -74,7 +74,44 @@ export const AGENT_ROLE_LABELS: Record<AgentRole, string> = {
   general: "General",
 };
 
-export const AGENT_DEFAULT_MAX_CONCURRENT_RUNS = 20;
+export const AGENT_DEFAULT_MAX_CONCURRENT_RUNS = 1;
+
+/**
+ * Instance-wide cap on concurrent heartbeat runs whose adapters spawn on the
+ * Paperclip host (local CLIs, `process`, etc.). Remote/cloud adapters are not
+ * counted. `PAPERCLIP_MAX_CONCURRENT_HOST_RUNS=0` disables the cap.
+ */
+export const INSTANCE_DEFAULT_MAX_CONCURRENT_HOST_RUNS = 8;
+
+/** Adapters that do not spawn a heavy child process on the Paperclip host. */
+export const REMOTE_AGENT_ADAPTER_TYPES = [
+  "http",
+  "cursor_cloud",
+  "hermes_gateway",
+  "openclaw_gateway",
+] as const;
+
+export type RemoteAgentAdapterType = (typeof REMOTE_AGENT_ADAPTER_TYPES)[number];
+
+export function isHostProcessAdapterType(adapterType: string): boolean {
+  return !(REMOTE_AGENT_ADAPTER_TYPES as readonly string[]).includes(adapterType);
+}
+
+/**
+ * Resolve the instance host-run cap from env.
+ * Empty/invalid values fall back to {@link INSTANCE_DEFAULT_MAX_CONCURRENT_HOST_RUNS}.
+ * `0` means unlimited.
+ */
+export function resolveMaxConcurrentHostRuns(
+  env: NodeJS.Dict<string> | undefined = typeof process === "undefined" ? undefined : process.env,
+): number {
+  const raw = env?.PAPERCLIP_MAX_CONCURRENT_HOST_RUNS;
+  if (raw === undefined || raw.trim() === "") return INSTANCE_DEFAULT_MAX_CONCURRENT_HOST_RUNS;
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed) || parsed < 0) return INSTANCE_DEFAULT_MAX_CONCURRENT_HOST_RUNS;
+  return Math.floor(parsed);
+}
+
 export const WORKSPACE_BRANCH_ROUTINE_VARIABLE = "workspaceBranch";
 
 // Config keys owned by Paperclip/company state rather than one concrete adapter.
