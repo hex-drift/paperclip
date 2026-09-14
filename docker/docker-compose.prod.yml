@@ -77,6 +77,9 @@ services:
       # MIA dashboard trusted launcher (process adapter runs in this container).
       # Host path is immutable per-hash; isolation of process-host is a follow-up.
       - /opt/dashboard-runner/current:/dashboard-runner:ro
+      # TES verified RunnerBinding descriptor. Keep the env on the TES process
+      # agent only — do not set MIA_RUNNER_BINDING_FILE on this container.
+      - /opt/dashboard-runner/bindings:/etc/dashboard-runner:ro
     entrypoint: ["/bin/sh", "-c"]
     command: >
       "
