@@ -30,7 +30,7 @@
         { "name": "PAPERCLIP_PUBLIC_URL", "value": "https://<DOMAIN>" },
         { "name": "PAPERCLIP_MIGRATION_AUTO_APPLY", "value": "true" },
         { "name": "HEARTBEAT_SCHEDULER_ENABLED", "value": "true" },
-        { "name": "PAPERCLIP_MAX_CONCURRENT_HOST_RUNS", "value": "12" }
+        { "name": "PAPERCLIP_MAX_CONCURRENT_HOST_RUNS", "value": "16" }
       ],
       "secrets": [
         {

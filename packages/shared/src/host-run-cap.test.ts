@@ -21,7 +21,7 @@ describe("host-process run cap", () => {
     expect(isHostProcessAdapterType("openclaw_gateway")).toBe(false);
   });
 
-  it("defaults to 12 concurrent host runs and treats 0 as unlimited", () => {
+  it("defaults to 16 concurrent host runs and treats 0 as unlimited", () => {
     expect(resolveMaxConcurrentHostRuns({})).toBe(INSTANCE_DEFAULT_MAX_CONCURRENT_HOST_RUNS);
     expect(resolveMaxConcurrentHostRuns({ PAPERCLIP_MAX_CONCURRENT_HOST_RUNS: "" })).toBe(
       INSTANCE_DEFAULT_MAX_CONCURRENT_HOST_RUNS,
