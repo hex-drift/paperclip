@@ -81,7 +81,7 @@ export const AGENT_DEFAULT_MAX_CONCURRENT_RUNS = 1;
  * Paperclip host (local CLIs, `process`, etc.). Remote/cloud adapters are not
  * counted. `PAPERCLIP_MAX_CONCURRENT_HOST_RUNS=0` disables the cap.
  */
-export const INSTANCE_DEFAULT_MAX_CONCURRENT_HOST_RUNS = 8;
+export const INSTANCE_DEFAULT_MAX_CONCURRENT_HOST_RUNS = 12;
 
 /** Adapters that do not spawn a heavy child process on the Paperclip host. */
 export const REMOTE_AGENT_ADAPTER_TYPES = [

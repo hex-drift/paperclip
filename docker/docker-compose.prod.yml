@@ -70,7 +70,7 @@ services:
       HOME: "/home/node"
       GEMINI_CLI_TRUST_WORKSPACE: "true"
       NODE_OPTIONS: "--max-old-space-size=8192"
-      PAPERCLIP_MAX_CONCURRENT_HOST_RUNS: "8"
+      PAPERCLIP_MAX_CONCURRENT_HOST_RUNS: "12"
     volumes:
       - paperclip-data:/paperclip
       - /var/run/docker.sock:/var/run/docker.sock
