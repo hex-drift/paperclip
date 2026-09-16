@@ -133,6 +133,12 @@ RUN find packages/paperclip-runner/runner packages/paperclip-runner/protocol -ty
 ARG PAPERCLIP_BUILD_COMMIT=""
 RUN pnpm --filter @paperclipai/ui build
 RUN pnpm --filter @paperclipai/plugin-sdk build
+# Self-hosted production copies this tree to /app. LLM Wiki is installed from
+# that bundled path, but dist/ is gitignored, so without an explicit build the
+# plugin activates as "no longer exposes a Paperclip manifest" after every
+# image rebuild.
+RUN pnpm --filter @paperclipai/plugin-llm-wiki build
+RUN test -f packages/plugins/plugin-llm-wiki/dist/manifest.js || (echo "ERROR: plugin-llm-wiki dist missing" && exit 1)
 # The server build runs scripts/write-build-stamp.mjs, which stamps the built
 # commit into dist/build-info.json. The build context has no .git, so the
 # script reads PAPERCLIP_BUILD_COMMIT instead. Docker exposes an ARG to the
