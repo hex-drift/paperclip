@@ -180,6 +180,12 @@ export const DEFAULT_SANDBOX_CALLBACK_BRIDGE_ROUTE_ALLOWLIST: readonly SandboxCa
   { method: "POST", path: /^\/api\/issues\/[^/]+\/work-products$/ },
   { method: "PATCH", path: /^\/api\/work-products\/[^/]+$/ },
 
+  // Issue attachments: upload, list, retrieve, and delete deliverables
+  { method: "GET", path: /^\/api\/issues\/[^/]+\/attachments$/ },
+  { method: "POST", path: /^\/api\/companies\/[^/]+\/issues\/[^/]+\/attachments$/ },
+  { method: "GET", path: /^\/api\/attachments\/[^/]+(?:\/content)?$/ },
+  { method: "DELETE", path: /^\/api\/attachments\/[^/]+$/ },
+
   // Issue-thread interactions (create, resolve, verdict, and withdraw)
   { method: "GET", path: /^\/api\/issues\/[^/]+\/interactions(?:\/[^/]+)?$/ },
   { method: "POST", path: /^\/api\/issues\/[^/]+\/interactions$/ },
