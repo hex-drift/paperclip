@@ -81,6 +81,9 @@ services:
       # TES verified RunnerBinding descriptor. Keep the env on the TES process
       # agent only — do not set MIA_RUNNER_BINDING_FILE on this container.
       - /opt/dashboard-runner/bindings:/etc/dashboard-runner:ro
+      # MIA routines trusted launcher (TES preview Mers). Process adapter runs
+      # in this container. Host path is immutable per-hash.
+      - /opt/mia-routines-runner/current:/mia-routines-runner:ro
     entrypoint: ["/bin/sh", "-c"]
     command: >
       "
