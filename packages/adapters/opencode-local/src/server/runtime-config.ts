@@ -121,6 +121,54 @@ function parseMcpConfig(
 }
 
 const AI_GATE_PROVIDER_ID = "ai-gate";
+const HEX_DATA_MCP_NAME = "hex-data-mcp";
+const HEX_DATA_MCP_TOKEN_ENV = "HEX_DATA_MCP_TOKEN";
+const HEX_DATA_MCP_URL_ENV = "HEX_DATA_MCP_URL";
+const DEFAULT_HEX_DATA_MCP_URL = "https://hex-data-mcp.hexdrift-project.workers.dev/mcp";
+const HEX_DATA_MCP_BQ_NAME = "hex-data-mcp-bq";
+const HEX_DATA_MCP_BQ_TOKEN_ENV = "HEX_DATA_MCP_BQ_TOKEN";
+const HEX_DATA_MCP_BQ_URL_ENV = "HEX_DATA_MCP_BQ_URL";
+const DEFAULT_HEX_DATA_MCP_BQ_URL = "https://hex-data-mcp-bq.hexdrift-project.workers.dev/mcp";
+
+function readNonEmptyEnv(env: Record<string, string>, name: string): string | null {
+  const value = env[name];
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+/** HTTP MCP with a per-agent bearer token. Absent/empty token skips inject. */
+function remoteBearerMcpFromEnv(
+  env: Record<string, string>,
+  tokenEnv: string,
+  urlEnv: string,
+  defaultUrl: string,
+): Record<string, unknown> | null {
+  const token = readNonEmptyEnv(env, tokenEnv);
+  if (!token) return null;
+  const url = readNonEmptyEnv(env, urlEnv) ?? defaultUrl;
+  const authorization = /^bearer\s+/i.test(token) ? token : `Bearer ${token}`;
+  return {
+    type: "remote",
+    url,
+    headers: { Authorization: authorization },
+  };
+}
+
+/** Per-agent hex-data-mcp. Absent/empty token keeps the host MCP set unchanged. */
+function hexDataMcpServerFromEnv(env: Record<string, string>): Record<string, unknown> | null {
+  return remoteBearerMcpFromEnv(env, HEX_DATA_MCP_TOKEN_ENV, HEX_DATA_MCP_URL_ENV, DEFAULT_HEX_DATA_MCP_URL);
+}
+
+/** Per-agent BigQuery hex-data-mcp. Same opt-in as ClickHouse; different token/URL. */
+function hexDataMcpBqServerFromEnv(env: Record<string, string>): Record<string, unknown> | null {
+  return remoteBearerMcpFromEnv(
+    env,
+    HEX_DATA_MCP_BQ_TOKEN_ENV,
+    HEX_DATA_MCP_BQ_URL_ENV,
+    DEFAULT_HEX_DATA_MCP_BQ_URL,
+  );
+}
 
 function parseConfiguredModelRef(raw: unknown): { provider: string; model: string } | null {
   if (typeof raw !== "string") return null;
@@ -315,6 +363,16 @@ export async function prepareOpenCodeRuntimeConfig(input: {
   ) {
     nextMcp[SEQUENTIAL_THINKING_MCP_NAME] = sequentialThinkingOpenCodeServer();
     notes.push("Injected Sequential Thinking MCP server.");
+  }
+  const hexDataMcp = hexDataMcpServerFromEnv(input.env);
+  if (hexDataMcp) {
+    nextMcp[HEX_DATA_MCP_NAME] = hexDataMcp;
+    notes.push("Injected hex-data-mcp from agent HEX_DATA_MCP_TOKEN.");
+  }
+  const hexDataMcpBq = hexDataMcpBqServerFromEnv(input.env);
+  if (hexDataMcpBq) {
+    nextMcp[HEX_DATA_MCP_BQ_NAME] = hexDataMcpBq;
+    notes.push("Injected hex-data-mcp-bq from agent HEX_DATA_MCP_BQ_TOKEN.");
   }
   if (Object.keys(nextMcp).length > 0) {
     nextConfig.mcp = nextMcp;

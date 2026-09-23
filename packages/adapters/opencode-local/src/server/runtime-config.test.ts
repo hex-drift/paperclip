@@ -510,6 +510,95 @@ describe("prepareOpenCodeRuntimeConfig", () => {
     await prepared.cleanup();
   });
 
+  it("injects hex-data-mcp when HEX_DATA_MCP_TOKEN is set", async () => {
+    const configHome = await makeConfigHome({ mcp: { existing: { type: "local", command: ["existing"] } } });
+    const prepared = await prepareOpenCodeRuntimeConfig({
+      env: { XDG_CONFIG_HOME: configHome, HEX_DATA_MCP_TOKEN: "test-token" },
+      config: {},
+    });
+    cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
+    const runtimeConfig = JSON.parse(
+      await fs.readFile(path.join(prepared.env.XDG_CONFIG_HOME, "opencode", "opencode.json"), "utf8"),
+    ) as { mcp: Record<string, unknown> };
+    expect(runtimeConfig.mcp["hex-data-mcp"]).toEqual({
+      type: "remote",
+      url: "https://hex-data-mcp.hexdrift-project.workers.dev/mcp",
+      headers: { Authorization: "Bearer test-token" },
+    });
+    expect(runtimeConfig.mcp.existing).toEqual({ type: "local", command: ["existing"] });
+    expect(prepared.notes).toContain("Injected hex-data-mcp from agent HEX_DATA_MCP_TOKEN.");
+    await prepared.cleanup();
+  });
+
+  it("does not inject hex-data-mcp when HEX_DATA_MCP_TOKEN is missing or blank", async () => {
+    const configHome = await makeConfigHome({ permission: { read: "allow" } });
+    const prepared = await prepareOpenCodeRuntimeConfig({
+      env: { XDG_CONFIG_HOME: configHome, HEX_DATA_MCP_TOKEN: "   " },
+      config: {},
+    });
+    cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
+    const runtimeConfig = JSON.parse(
+      await fs.readFile(path.join(prepared.env.XDG_CONFIG_HOME, "opencode", "opencode.json"), "utf8"),
+    ) as Record<string, unknown>;
+    expect(runtimeConfig.mcp).toBeUndefined();
+    expect(prepared.notes.some((note) => note.includes("hex-data-mcp"))).toBe(false);
+    await prepared.cleanup();
+  });
+
+  it("injects hex-data-mcp-bq when HEX_DATA_MCP_BQ_TOKEN is set", async () => {
+    const configHome = await makeConfigHome({ mcp: { existing: { type: "local", command: ["existing"] } } });
+    const prepared = await prepareOpenCodeRuntimeConfig({
+      env: { XDG_CONFIG_HOME: configHome, HEX_DATA_MCP_BQ_TOKEN: "bq-test-token" },
+      config: {},
+    });
+    cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
+    const runtimeConfig = JSON.parse(
+      await fs.readFile(path.join(prepared.env.XDG_CONFIG_HOME, "opencode", "opencode.json"), "utf8"),
+    ) as { mcp: Record<string, unknown> };
+    expect(runtimeConfig.mcp["hex-data-mcp-bq"]).toEqual({
+      type: "remote",
+      url: "https://hex-data-mcp-bq.hexdrift-project.workers.dev/mcp",
+      headers: { Authorization: "Bearer bq-test-token" },
+    });
+    expect(runtimeConfig.mcp.existing).toEqual({ type: "local", command: ["existing"] });
+    expect(prepared.notes).toContain("Injected hex-data-mcp-bq from agent HEX_DATA_MCP_BQ_TOKEN.");
+    await prepared.cleanup();
+  });
+
+  it("does not inject hex-data-mcp-bq when HEX_DATA_MCP_BQ_TOKEN is missing", async () => {
+    const configHome = await makeConfigHome({ permission: { read: "allow" } });
+    const prepared = await prepareOpenCodeRuntimeConfig({
+      env: { XDG_CONFIG_HOME: configHome },
+      config: {},
+    });
+    cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
+    const runtimeConfig = JSON.parse(
+      await fs.readFile(path.join(prepared.env.XDG_CONFIG_HOME, "opencode", "opencode.json"), "utf8"),
+    ) as Record<string, unknown>;
+    expect(runtimeConfig.mcp).toBeUndefined();
+    expect(prepared.notes.some((note) => note.includes("hex-data-mcp-bq"))).toBe(false);
+    await prepared.cleanup();
+  });
+
+  it("uses HEX_DATA_MCP_URL and keeps an existing Bearer prefix", async () => {
+    const configHome = await makeConfigHome();
+    const prepared = await prepareOpenCodeRuntimeConfig({
+      env: {
+        XDG_CONFIG_HOME: configHome,
+        HEX_DATA_MCP_TOKEN: "Bearer already-prefixed",
+        HEX_DATA_MCP_URL: "https://hex-data-mcp-stage.example/mcp",
+      },
+      config: {},
+    });
+    cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
+    const runtimeConfig = JSON.parse(
+      await fs.readFile(path.join(prepared.env.XDG_CONFIG_HOME, "opencode", "opencode.json"), "utf8"),
+    ) as { mcp: { "hex-data-mcp": { url: string; headers: { Authorization: string } } } };
+    expect(runtimeConfig.mcp["hex-data-mcp"].url).toBe("https://hex-data-mcp-stage.example/mcp");
+    expect(runtimeConfig.mcp["hex-data-mcp"].headers.Authorization).toBe("Bearer already-prefixed");
+    await prepared.cleanup();
+  });
+
   it("respects explicit opt-out", async () => {
     const configHome = await makeConfigHome();
     const prepared = await prepareOpenCodeRuntimeConfig({
