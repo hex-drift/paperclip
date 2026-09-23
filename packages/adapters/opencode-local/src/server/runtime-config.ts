@@ -116,6 +116,55 @@ function parseMcpConfig(
 }
 
 const AI_GATE_PROVIDER_ID = "ai-gate";
+const HEX_DATA_MCP_NAME = "hex-data-mcp";
+const HEX_DATA_MCP_TOKEN_ENV = "HEX_DATA_MCP_TOKEN";
+const HEX_DATA_MCP_URL_ENV = "HEX_DATA_MCP_URL";
+const DEFAULT_HEX_DATA_MCP_URL = "https://hex-data-mcp.hexdrift-project.workers.dev/mcp";
+const HEX_DATA_MCP_BQ_NAME = "hex-data-mcp-bq";
+const HEX_DATA_MCP_BQ_TOKEN_ENV = "HEX_DATA_MCP_BQ_TOKEN";
+const HEX_DATA_MCP_BQ_URL_ENV = "HEX_DATA_MCP_BQ_URL";
+const DEFAULT_HEX_DATA_MCP_BQ_URL = "https://hex-data-mcp-bq.hexdrift-project.workers.dev/mcp";
+
+function readNonEmptyEnv(env: Record<string, string>, name: string): string | null {
+  const value = env[name];
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+/** HTTP MCP with a per-agent bearer token. Absent/empty token skips inject. */
+function remoteBearerMcpFromEnv(
+  env: Record<string, string>,
+  tokenEnv: string,
+  urlEnv: string,
+  defaultUrl: string,
+): Record<string, unknown> | null {
+  const token = readNonEmptyEnv(env, tokenEnv);
+  if (!token) return null;
+  const url = readNonEmptyEnv(env, urlEnv) ?? defaultUrl;
+  const authorization = /^bearer\s+/i.test(token) ? token : `Bearer ${token}`;
+  return {
+    type: "remote",
+    url,
+    headers: { Authorization: authorization },
+  };
+}
+
+/** Per-agent hex-data-mcp. Absent/empty token keeps the host MCP set unchanged. */
+function hexDataMcpServerFromEnv(env: Record<string, string>): Record<string, unknown> | null {
+  return remoteBearerMcpFromEnv(env, HEX_DATA_MCP_TOKEN_ENV, HEX_DATA_MCP_URL_ENV, DEFAULT_HEX_DATA_MCP_URL);
+}
+
+/** Per-agent BigQuery hex-data-mcp. Same opt-in as ClickHouse; different token/URL. */
+function hexDataMcpBqServerFromEnv(env: Record<string, string>): Record<string, unknown> | null {
+  return remoteBearerMcpFromEnv(
+    env,
+    HEX_DATA_MCP_BQ_TOKEN_ENV,
+    HEX_DATA_MCP_BQ_URL_ENV,
+    DEFAULT_HEX_DATA_MCP_BQ_URL,
+  );
+}
+
 function parseConfiguredModelRef(raw: unknown): { provider: string; model: string } | null {
   if (typeof raw !== "string") return null;
   const trimmed = raw.trim();
@@ -278,6 +327,45 @@ export async function prepareOpenCodeRuntimeConfig(input: {
   };
   if (Object.keys(nextProvider).length > 0) {
     nextConfig.provider = nextProvider;
+  }
+
+  // Merge per-environment MCP servers supplied via PAPERCLIP_OPENCODE_MCP (a JSON
+  // object in OpenCode's `mcp` shape). The runtime config is copied from the host's
+  // XDG config dir, so an MCP server configured inside the execution target itself
+  // is invisible to the run. Agents that need a target-local MCP server (one bound
+  // to that machine's browser profile or credentials) declare it here, on the
+  // environment, instead of it having to exist for every agent on the host.
+  const mcpServers = parseMcpConfig(
+    input.env.PAPERCLIP_OPENCODE_MCP ?? process.env.PAPERCLIP_OPENCODE_MCP,
+    resolveEnv,
+    notes,
+  );
+  const existingMcp = isPlainObject(existingConfig.mcp) ? existingConfig.mcp : {};
+  const nextMcp: Record<string, unknown> = { ...existingMcp, ...(mcpServers ?? {}) };
+  if (mcpServers) {
+    notes.push(
+      `Injected ${Object.keys(mcpServers).length} MCP server(s) from PAPERCLIP_OPENCODE_MCP: ${Object.keys(mcpServers).join(", ")}.`,
+    );
+  }
+  if (
+    sequentialThinkingMcpEnabled(input.env) &&
+    !isPlainObject(nextMcp[SEQUENTIAL_THINKING_MCP_NAME])
+  ) {
+    nextMcp[SEQUENTIAL_THINKING_MCP_NAME] = sequentialThinkingOpenCodeServer();
+    notes.push("Injected Sequential Thinking MCP server.");
+  }
+  const hexDataMcp = hexDataMcpServerFromEnv(input.env);
+  if (hexDataMcp) {
+    nextMcp[HEX_DATA_MCP_NAME] = hexDataMcp;
+    notes.push("Injected hex-data-mcp from agent HEX_DATA_MCP_TOKEN.");
+  }
+  const hexDataMcpBq = hexDataMcpBqServerFromEnv(input.env);
+  if (hexDataMcpBq) {
+    nextMcp[HEX_DATA_MCP_BQ_NAME] = hexDataMcpBq;
+    notes.push("Injected hex-data-mcp-bq from agent HEX_DATA_MCP_BQ_TOKEN.");
+  }
+  if (Object.keys(nextMcp).length > 0) {
+    nextConfig.mcp = nextMcp;
   }
 
   // Pin OpenCode's auxiliary "small" model (used for session-title generation and
