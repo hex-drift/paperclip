@@ -11,6 +11,8 @@ FROM node:lts-trixie-slim
 ARG AGENT_USER=agent
 ARG AGENT_UID=2000
 ARG AGENT_GID=2000
+ARG GOOSE_VERSION=v1.52.0
+ARG PI_PACKAGE_VERSION=latest
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -27,10 +29,18 @@ RUN groupadd -g ${AGENT_GID} ${AGENT_USER} \
 RUN npm install -g \
   @anthropic-ai/claude-code@latest \
   @openai/codex@latest \
+  @mariozechner/pi-coding-agent@${PI_PACKAGE_VERSION} \
   opencode-ai \
   agent-browser \
   @toolbox-sdk/server@latest \
   @customerio/cli@latest
+
+# Install the Goose CLI as a pinned, non-interactive release binary. Goose is
+# deliberately installed in /usr/local/bin so SSH login shells and non-login
+# remote commands resolve the same executable.
+RUN curl -fsSL https://github.com/aaif-goose/goose/releases/download/${GOOSE_VERSION}/download_cli.sh \
+  | GOOSE_VERSION=${GOOSE_VERSION} GOOSE_BIN_DIR=/usr/local/bin CONFIGURE=false bash \
+  && goose --version
 
 # System libraries required by agent-browser's Chromium
 RUN apt-get update \
