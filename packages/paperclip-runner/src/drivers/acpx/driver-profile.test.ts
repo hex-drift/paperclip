@@ -47,7 +47,7 @@ describe("ACPX driver profile", () => {
 
   it.each([
     ["claude", "claude-sonnet-5"],
-    ["codex", "gpt-5.6-sol"],
+    ["codex", "gpt-6-sol"],
   ] as const)("accepts the exact qualified %s model", (agent, model) => {
     expect(validateAcpxDriverConfig({ agent, model })).toEqual({
       ok: true,
@@ -64,7 +64,7 @@ describe("ACPX driver profile", () => {
     expect(
       validateAcpxDriverConfig({
         agent: "codex",
-        model: "gpt-5.6-sol",
+        model: "gpt-6-sol",
         command: "/tmp/arbitrary-provider",
       }),
     ).toMatchObject({

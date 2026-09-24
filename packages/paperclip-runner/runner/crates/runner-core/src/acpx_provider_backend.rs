@@ -155,7 +155,7 @@ impl AcpxProviderDescriptor {
                 "sha256:9d73d1f0f121fb96cc8badb28c22d5bff02d8582eb2e40360a81c189e1b9422a",
             ),
             "codex" => (
-                "gpt-5.6-sol",
+                "gpt-6-sol",
                 "@agentclientprotocol/codex-acp",
                 "1.6.2",
                 Some("@openai/codex"),
@@ -1857,7 +1857,7 @@ mod tests {
                 )
             } else {
                 (
-                    "gpt-5.6-sol",
+                    "gpt-6-sol",
                     "@agentclientprotocol/codex-acp",
                     "1.6.2",
                     json!("@openai/codex"),
@@ -1997,8 +1997,8 @@ mod tests {
             agent_session_id: "agent-1".to_owned(),
             profile_digest: format!("sha256:{}", "1".repeat(64)),
             workspace_digest: format!("sha256:{}", "2".repeat(64)),
-            requested_model: "gpt-5.6-sol".to_owned(),
-            effective_model: "gpt-5.6-sol".to_owned(),
+            requested_model: "gpt-6-sol".to_owned(),
+            effective_model: "gpt-6-sol".to_owned(),
             permission_mode: Some(AcpxPermissionMode::ApproveReads),
             provider_lifetime_fence_candidates: [60_001, 60_002, 60_003],
         };

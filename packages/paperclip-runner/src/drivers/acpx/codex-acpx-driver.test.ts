@@ -22,7 +22,7 @@ import type { AcpxRecoveryWorkspaceLease } from "./runtime-sandbox.js";
 
 describe("Codex ACPX harness driver", () => {
   it.each([
-    ["claude", "claude-sonnet-5"], ["codex", "gpt-5.6-sol"],
+    ["claude", "claude-sonnet-5"], ["codex", "gpt-6-sol"],
   ] as const)("launches %s in full auto when no mode is supplied", async (agent, model) => {
     const fixture = driverFixture({ agent, model, permissionMode: undefined });
     const session = await fixture.driver.openSession({
@@ -2649,7 +2649,7 @@ function driverFixture(
   const driver = new CodexAcpxDriver(
     {
       runtimeDirectory: "/runtime",
-      model: "gpt-5.6-sol",
+      model: "gpt-6-sol",
       permissionMode: "approve-reads",
       dynamicTools: [
         {
@@ -2700,8 +2700,8 @@ function fakeHost(createTurn: () => AcpxRuntimeTurn, onClose: () => void) {
       agentSessionId: "agent-1",
       profileDigest: `sha256:${"a".repeat(64)}`,
       workspaceDigest: `sha256:${"b".repeat(64)}`,
-      requestedModel: "gpt-5.6-sol",
-      effectiveModel: "gpt-5.6-sol",
+      requestedModel: "gpt-6-sol",
+      effectiveModel: "gpt-6-sol",
       permissionMode: "approve-reads" as const,
       providerLifetimeFenceCandidates: [60_001, 60_002, 60_003] as const,
     }),
@@ -2711,16 +2711,16 @@ function fakeHost(createTurn: () => AcpxRuntimeTurn, onClose: () => void) {
       workspaceDigest: `sha256:${"b".repeat(64)}`,
       runtimeRoot: "/runtime/acpx/session-1",
       profileDigest: `sha256:${"a".repeat(64)}`,
-      requestedModel: "gpt-5.6-sol",
-      effectiveModel: "gpt-5.6-sol",
+      requestedModel: "gpt-6-sol",
+      effectiveModel: "gpt-6-sol",
       permissionMode: "approve-reads" as const,
       profileSessionKey: "paperclip-session",
     }),
     status: vi.fn(async () => ({
       agentSessionId: "agent-1",
       models: {
-        currentModelId: "gpt-5.6-sol",
-        availableModelIds: ["gpt-5.6-sol"],
+        currentModelId: "gpt-6-sol",
+        availableModelIds: ["gpt-6-sol"],
       },
     })),
     startTurn: vi.fn((_input: AcpxRuntimeTurnInput) => createTurn()),

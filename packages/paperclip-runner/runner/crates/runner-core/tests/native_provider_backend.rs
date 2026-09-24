@@ -185,7 +185,7 @@ fn prepare_payload_with_mode(directory: &Path, agent: &str, mode: &str) -> Value
             "driver": "acpx_runtime",
             "providerVersion": "0.13.1",
             "agent": agent,
-            "model": "gpt-5.6-sol",
+            "model": "gpt-6-sol",
             "acpxVersion": "0.13.1",
             "agentServerPackage": "@agentclientprotocol/codex-acp",
             "agentServerVersion": "1.6.2",

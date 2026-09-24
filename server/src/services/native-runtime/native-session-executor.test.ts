@@ -1231,7 +1231,7 @@ describe("native harness persistence profiles", () => {
 
 describe("verified native harness backups", () => {
   const backupExecution = {
-    provider: { kind: "codex", model: "gpt-5.6-sol", approvalPolicy: "never" },
+    provider: { kind: "codex", model: "gpt-6-sol", approvalPolicy: "never" },
     binding: {
       companyId: "company",
       runId: "run",
@@ -7514,7 +7514,7 @@ describe("native process ownership", () => {
       {
         kind: "acpx",
         agent: "codex",
-        model: "gpt-5.6-sol",
+        model: "gpt-6-sol",
         permissionMode: "deny-all",
       },
       "acpx_runtime",
@@ -10649,7 +10649,7 @@ describe("runnerd provider runtime wiring", () => {
       provider: {
         kind: "acpx",
         agent: "codex",
-        model: "gpt-5.6-sol",
+        model: "gpt-6-sol",
         permissionMode: "approve-reads",
         profile: {
           driverKind: "acpx_runtime",

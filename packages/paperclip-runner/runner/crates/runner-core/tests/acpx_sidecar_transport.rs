@@ -26,7 +26,7 @@ fn buffers_events_that_arrive_before_a_response() {
     let result = transport
         .request(
             GeneratedAcpxSidecarCommand::Initialize,
-            json!({ "agent": "codex", "model": "gpt-5.6-sol" }),
+            json!({ "agent": "codex", "model": "gpt-6-sol" }),
         )
         .expect("fake initialize should respond");
     assert_eq!(result["command"], "initialize");

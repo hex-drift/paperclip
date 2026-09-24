@@ -3,7 +3,7 @@
 ## Scope and provenance
 
 The live qualification agent remains Paperclip Runner → Codex →
-`gpt-5.6-luna`. The earlier real Slack, GitHub, Discord, and Telegram text
+`gpt-6-luna`. The earlier real Slack, GitHub, Discord, and Telegram text
 samples completed in 13.472–16.467 seconds from send to provider acknowledgement.
 Those are historical samples, not measurements of the changes in this document.
 Teams still has no qualified live tenant. Terra has not been substituted.
@@ -149,7 +149,7 @@ runner binaries share SHA256
 `f7c1273cce29e521e820ad947d657e500da28477f563053148e764cdfb3730cd`.
 The restarted server reports `2026.831.0+413.git.26b6df7c1` at
 `http://127.0.0.1:3103`; its log is `server-native-checkpoint-16.log`.
-Maya remains `paperclip_runner`, provider `codex`, model `gpt-5.6-luna`.
+Maya remains `paperclip_runner`, provider `codex`, model `gpt-6-luna`.
 
 The staged Rust-backed Codex transport suite passed **71/71** in
 `upstream-runner-staged-driver-03.log`, including cold restoration with a changed
@@ -186,7 +186,7 @@ The capacity and browser-input gates above are historical: the account now
 reports available Codex capacity and signed-in in-app browser input works again.
 No usage reset was consumed, no credits were purchased, and no alternate model
 was substituted. The server still reports `2026.831.0+413.git.26b6df7c1` during
-these tests. All runs below use native `codex_app_server` with `gpt-5.6-luna`.
+these tests. All runs below use native `codex_app_server` with `gpt-6-luna`.
 
 | Live journey                  | Observed outcome                                        | Native run                             | Submit to final provider acknowledgement |
 | ----------------------------- | ------------------------------------------------------- | -------------------------------------- | ---------------------------------------- |
@@ -310,7 +310,7 @@ prevent the conflicting claim.
 
 Commit `062cfcacc` is pushed and deployed on the isolated live instance. Health
 reports that exact revision, startup recovery ready, and the agent remains
-`paperclip_runner` / `codex` / `gpt-5.6-luna`. No credentials were regenerated.
+`paperclip_runner` / `codex` / `gpt-6-luna`. No credentials were regenerated.
 The new follow-up in the original Discord conversation succeeded as run
 `b9fc4be1-3a22-44c8-9198-4527fc8b90c4`: native execution took **12.85 s** and
 the final publication followed **0.75 s** later. Its new normalized session is
@@ -435,7 +435,7 @@ reports `2026.831.0+419.git.205c0ca99`. Deterministic browser coverage also pass
 fixture coverage, separate from the signed-in provider journeys below.
 
 Maya's runtime settings visibly select **Paperclip Runner → Codex →
-`gpt-5.6-luna`**, with automatic isolated permissions and turn-by-turn lifecycle.
+`gpt-6-luna`**, with automatic isolated permissions and turn-by-turn lifecycle.
 The actual native run/model records agree. No Terra substitution was made.
 
 - **Slack structured question: passed.** A real thread message requested an
@@ -542,7 +542,7 @@ of full production readiness should omit this remaining race.
 
 The server reported this exact clean revision after startup at 05:29:53 UTC.
 Maya's runtime settings still showed `paperclip_runner`, Codex, and
-`gpt-5.6-luna`; no fallback to Terra was made. The frozen native matrix passed
+`gpt-6-luna`; no fallback to Terra was made. The frozen native matrix passed
 **1,371/1,371**, 36 files, 161.29 seconds
 (`native-followup-root-tests-02.log`). Full chat integration passed
 **288/288** on isolated PostgreSQL (`frozen-chat-integration-0908-01.log`).
@@ -590,7 +590,7 @@ status or a generic working indicator.
 
 ### Ownership-safe recovery and native runtime audit (September 8)
 
-The actual Codex rollout `turn_context.model` confirms `gpt-5.6-luna` on both
+The actual Codex rollout `turn_context.model` confirms `gpt-6-luna` on both
 the original Slack turn and its recovery, not merely the agent configuration.
 The Board's native run inspector exposes canonical events and diagnostics;
 private reasoning/raw tools remain Board-only. No Terra fallback was used.
@@ -763,7 +763,7 @@ and `baff6436-526b-45a7-abdf-f75307ca2842`). The durable wake ledger contains on
 receipt per input, including deferred and coalesced aliases; no input was lost
 across the host sleep.
 
-Independent tool evidence confirms actual `turn_context.model=gpt-5.6-luna` in
+Independent tool evidence confirms actual `turn_context.model=gpt-6-luna` in
 both new Telegram and Discord provider rollouts, not just saved configuration.
 Telegram's historical reader returned the exact verified staged JPEG, and its
 `view_image` call opened that same path. Reuse prepared attachment
@@ -843,7 +843,7 @@ recovery holds remained intact. The final emitted server compile also passed
 (`native-review-emitted-tsc-root-02.log`).
 
 - Telegram run `7a26a46f-931e-4394-b6a5-3596393c39d0` completed in **31.005s**
-  on actual Codex `gpt-5.6-luna`. The original JPEG was read, viewed and reused
+  on actual Codex `gpt-6-luna`. The original JPEG was read, viewed and reused
   with its unchanged 221,327 bytes and SHA-256. The canonical reply and image
   each published once to messages `417200359:76` and `417200359:77`, with durable
   outbound message links. Request-to-image delivery took about **36s**. The
@@ -947,7 +947,7 @@ transport or missing-prompt claim.
 On the earlier deployed `3ab1384f9`, Discord and Telegram each received a natural
 request to choose Amber or Cobalt through a clickable prompt, then return only
 the chosen color. Actual `turn_context.model` records for all four source and
-continuation runs are `gpt-5.6-luna`.
+continuation runs are `gpt-6-luna`.
 
 - Discord source run `f93e89a8-6e36-447f-b523-11d7853be886` produced interaction
   `00de7efd-2876-45d1-91a4-0cf6e5a15722`. One Cobalt click settled the visible
@@ -1032,10 +1032,10 @@ restarting the idle live server; the verified webhook proxy was left running.
 Both answer deliveries had one attempt and zero errors; both continuations have
 persisted answer attestation and authorized presentation. The separate original
 human reviews remain pending with no resolution timestamp. An independent check
-of actual Codex `turn_context.model` events confirms `gpt-5.6-luna` in all four
+of actual Codex `turn_context.model` events confirms `gpt-6-luna` in all four
 source/continuation runs, not merely in the agent's configured model.
 
-The Telegram answer run page shows **PAPERCLIP RUNNER openai / gpt-5.6-luna**,
+The Telegram answer run page shows **PAPERCLIP RUNNER openai / gpt-6-luna**,
 the canonical **Amber** result and 51 events. Its Runner Inspector works with
 raw provider capture **off**, exposing canonical events and persisted
 presentation decisions privately in Paperclip. External chats received the
@@ -1085,7 +1085,7 @@ All four real provider-session declarations contain the updated completion
 schema and description. The existing fingerprint mechanism correctly starts a
 new Codex session with full task context while retaining each Paperclip
 conversation, task, attachments and audit history. Actual `turn_context.model`
-events confirm `gpt-5.6-luna` in all four initial runs and the Discord correction.
+events confirm `gpt-6-luna` in all four initial runs and the Discord correction.
 
 - Slack `3b9b46c4-e636-4a2f-8240-3cc126fc329c`: 14.864s run; exact visible
   `SLACK-LUNA-CONTRACT-READY`, one publication at 08:24:38.554.
@@ -1158,7 +1158,7 @@ experience is substantially improved: actual controls, one question at a time,
 visible working feedback, and a concise answer preserving both selections.
 All four answer deliveries have one claim attempt, zero errors, and exactly one
 fallback-wake target. Both tasks remain in review.
-An independent audit of actual Codex rollouts confirms **gpt-5.6-luna in all
+An independent audit of actual Codex rollouts confirms **gpt-6-luna in all
 six turns**, four real `request_human_input` calls using `payload.questions`,
 and two real `paperclip_finish` calls yielding to `response_wake`. All four
 provider-session declarations contain the corrected real-task question and
@@ -1225,7 +1225,7 @@ but had no useful Open task link because this instance advertised loopback.
 The private Board also shows repeated model workspace/filename typos during
 the 54.155s run; this is a model-quality cost, not transport queueing. A
 closed-metadata audit of all three actual Codex rollout windows confirms
-`gpt-5.6-luna`, not merely the configured model. GitHub made seven tool round
+`gpt-6-luna`, not merely the configured model. GitHub made seven tool round
 trips: five commands, file registration, and completion. Two commands supplied
 the wrong workspace and one returned a missing-file error. The failures
 themselves returned in 29–64ms, while failure-to-next-call intervals summed
@@ -1392,7 +1392,7 @@ complete persisted run wall time have different terminal boundaries and are
 reported separately here.
 
 A closed-metadata audit of the actual Codex turn contexts confirms
-**`gpt-5.6-luna` for this continuation and all three new media runs**, not
+**`gpt-6-luna` for this continuation and all three new media runs**, not
 only an agent configuration value. Native Runner remains the driver; no
 Terra substitution occurred. This test-it-for-real pass materially shaped
 the changes: genuine provider controls, visible delivery and timing from
@@ -1401,7 +1401,7 @@ the current answer were checked beyond the deterministic test results.
 ### Live Slack cancellation and Discord DM isolation — 2026-09-08
 
 These tests used the deployed `78a7e668e` server and the same Maya E2E
-`paperclip_runner` agent configured with `gpt-5.6-luna`; both new Discord
+`paperclip_runner` agent configured with `gpt-6-luna`; both new Discord
 runs and both Slack runs use `codex_app_server`. No model substitution,
 provider API shortcut, or direct database mutation was used.
 
@@ -1570,7 +1570,7 @@ webhook proxy remain running.
 ### Busy-thread follow-up qualification — 2026-09-08
 
 The live Maya configuration was re-read: `paperclip_runner`, model
-`gpt-5.6-luna`; actual new runs use `codex_app_server`. No legacy adapter or
+`gpt-6-luna`; actual new runs use `codex_app_server`. No legacy adapter or
 Terra substitution was used. On the running `27c6dc4f8` code, a Slack picnic
 request was sent at 10:11:51.174Z and a replacement request at 10:11:58.362Z
 while the first turn was visibly working. The documented FIFO behavior held:
@@ -1719,7 +1719,7 @@ at 10:31:20.672Z, **15.890s** end to end. Its working message
 `1788863466.965279` was updated in place, once; final publication
 `35675ea4-14cc-454f-9ba6-9490eb255462` took **346ms** from creation to
 published settlement. All these real runs use `codex_app_server`; Maya's
-persisted adapter/model remain `paperclip_runner` / `gpt-5.6-luna`.
+persisted adapter/model remain `paperclip_runner` / `gpt-6-luna`.
 
 The fresh deterministic browser suite passed **9/9** on isolated port 3199.
 No external provider account was accessed by that Playwright suite.
@@ -1820,7 +1820,7 @@ duplicate questions or final comments. The short question turn did not need
 a separate cadence-limited progress phase.
 
 Actual rollout contexts for all three clean-build runs confirm
-`gpt-5.6-luna` and `codex_app_server`. All four active provider endpoints
+`gpt-6-luna` and `codex_app_server`. All four active provider endpoints
 (Slack, Discord, Telegram, GitHub) remain assigned to Maya's
 `paperclip_runner` / Luna configuration. Terra was not substituted.
 GitHub's App delivery settings still show the six-digit Confirm access gate;
@@ -1862,7 +1862,7 @@ webhook-only proxy were verified running; port 443 remains tailnet-only.
 The Slack form request at 10:54:25.293Z exercised actual Runner/Codex Luna,
 not a synthetic interaction. Source run `8f019518-0a88-475c-a907-79ab28954ec0`
 resumed provider session `01a08037-0bb4-7b72-a4ae-2a724f876dbd`; its actual
-rollout turn context records `gpt-5.6-luna`. The working message
+rollout turn context records `gpt-6-luna`. The working message
 `1788864868.004959` became a native Respond card at 10:54:38.533Z, **13.240s**
 after the request. Respond opened a Slack modal with a Maple/Cedar selector
 and a free-text field. Empty submission showed required-field errors without
@@ -1920,7 +1920,7 @@ Luna asked the same two questions again as interaction
 answer. The continuation completed at 11:05:27.131Z on a fresh provider
 session `01a080b1-7be1-7711-9a15-e36e0c017bc9`.
 
-Closed inspection confirms actual `gpt-5.6-luna`, both canonical answers,
+Closed inspection confirms actual `gpt-6-luna`, both canonical answers,
 and the bridge-generated answered-question summary in the actual model input.
 The database interaction's nullable summary was not the cause: materialization
 correctly supplied its fallback. The follow-up investigation therefore targets
@@ -1993,7 +1993,7 @@ It returned exactly `Pine / violet harbor 27`, with no re-ask. Final publication
 `3c9f8d9c-3dd7-4a07-b7d8-6f62fa976ad7` edited the same working message
 `1788866698.368079` at 11:25:14.202Z: **17.470s** after Submit and 386ms
 after publication creation. Every associated outbound publication was attempt
-one. Actual rollout turn contexts verify `gpt-5.6-luna` for source and
+one. Actual rollout turn contexts verify `gpt-6-luna` for source and
 continuation, both using `codex_app_server`; Terra was not substituted.
 
 The same-build Discord 220-word text request was sent at 11:25:38.522Z.

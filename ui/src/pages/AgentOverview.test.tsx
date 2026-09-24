@@ -33,7 +33,7 @@ describe("AgentOverview", () => {
       reportsTo: null,
       capabilities: "Builds and verifies product changes.",
       adapterType: "codex_local",
-      adapterConfig: { model: "gpt-5.6-sol" },
+      adapterConfig: { model: "gpt-6-sol" },
       runtimeConfig: {},
       chainOfCommand: [],
       access: { canAssignTasks: true, taskAssignSource: "explicit_grant", membership: null, grants: [] },

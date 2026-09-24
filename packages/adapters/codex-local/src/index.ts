@@ -7,7 +7,7 @@ export const label = "Codex";
 
 export const SANDBOX_INSTALL_COMMAND = "npm install -g @openai/codex";
 
-// Use the concrete `gpt-5.6-sol` slug (Codex's own default for the 5.6 family) rather than the
+// Use the concrete `gpt-6-sol` slug rather than the bare `gpt-5.6` alias:
 // bare `gpt-5.6` alias: OpenAI ships no model metadata for the bare slug, so passing it makes the
 // Codex CLI warn ("Model metadata for `gpt-5.6` not found") and fall back to generic context limits.
 export const DEFAULT_CODEX_LOCAL_MODEL = PAPERCLIP_RUNNER_DEFAULT_MODELS.codex;
@@ -16,9 +16,7 @@ export const CODEX_LOCAL_FAST_MODE_SUPPORTED_MODELS = [
   "gpt-6-astra",
   "gpt-6-sol",
   "gpt-6-luna",
-  "gpt-5.6-sol",
   "gpt-5.6-terra",
-  "gpt-5.6-luna",
   "gpt-5.5",
   "gpt-5.4",
 ] as const;
@@ -32,7 +30,7 @@ function normalizeModelId(model: string | null | undefined): string {
 // (the old default) keep triggering "Model metadata for `gpt-5.6` not found" warnings and Codex
 // falls back to generic context-window limits, even on a Codex build that ships the 5.6 family.
 const CODEX_LOCAL_MODEL_ALIASES: Readonly<Record<string, string>> = {
-  "gpt-5.6": "gpt-5.6-sol",
+  "gpt-5.6": "gpt-6-sol",
 };
 
 const CODEX_LOCAL_DEFAULT_REASONING_EFFORTS = [
@@ -72,11 +70,9 @@ export function codexLocalReasoningEffortsForModel(
   switch (normalizedModel) {
     case "gpt-6-astra":
     case "gpt-6-sol":
-    case "gpt-5.6-sol":
     case "gpt-5.6-terra":
       return CODEX_LOCAL_ULTRA_REASONING_EFFORTS;
     case "gpt-6-luna":
-    case "gpt-5.6-luna":
       return CODEX_LOCAL_MAX_REASONING_EFFORTS;
     default:
       return CODEX_LOCAL_DEFAULT_REASONING_EFFORTS;
@@ -107,13 +103,11 @@ export function isCodexLocalFastModeSupported(model: string | null | undefined):
 }
 
 export const models = [
-  // DEFAULT_CODEX_LOCAL_MODEL is gpt-5.6-sol, so it doubles as the first (default) 5.6 entry.
+  // DEFAULT_CODEX_LOCAL_MODEL is gpt-6-sol, so it doubles as the first default entry.
   { id: DEFAULT_CODEX_LOCAL_MODEL, label: DEFAULT_CODEX_LOCAL_MODEL },
   { id: "gpt-6-astra", label: "gpt-6-astra" },
-  { id: "gpt-6-sol", label: "gpt-6-sol" },
   { id: "gpt-6-luna", label: "gpt-6-luna" },
   { id: "gpt-5.6-terra", label: "gpt-5.6-terra" },
-  { id: "gpt-5.6-luna", label: "gpt-5.6-luna" },
   { id: "gpt-5.4", label: "gpt-5.4" },
   { id: "gpt-5.4-mini", label: "gpt-5.4-mini" },
   { id: "gpt-5", label: "gpt-5" },

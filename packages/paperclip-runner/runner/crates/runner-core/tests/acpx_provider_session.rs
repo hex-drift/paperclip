@@ -37,7 +37,7 @@ fn config(mode: &str) -> AcpxProviderSessionConfig {
             shutdown_grace: Duration::from_millis(100),
         },
         agent: "codex".to_owned(),
-        model: "gpt-5.6-sol".to_owned(),
+        model: "gpt-6-sol".to_owned(),
         run_id: "run-1".to_owned(),
         catalog_revision: 1,
         runtime_directory: std::env::temp_dir(),
@@ -61,8 +61,8 @@ fn expected_identity() -> AcpxProviderSessionIdentity {
         agent_session_id: "agent-1".to_owned(),
         profile_digest: format!("sha256:{}", "1".repeat(64)),
         workspace_digest: format!("sha256:{}", "2".repeat(64)),
-        requested_model: "gpt-5.6-sol".to_owned(),
-        effective_model: "gpt-5.6-sol".to_owned(),
+        requested_model: "gpt-6-sol".to_owned(),
+        effective_model: "gpt-6-sol".to_owned(),
         permission_mode: Some(AcpxPermissionMode::ApproveReads),
         provider_lifetime_fence_candidates: [60_001, 60_002, 60_003],
     }
@@ -151,7 +151,7 @@ fn validates_qualified_policy_and_tool_catalog_before_spawning() {
 #[test]
 fn admits_custom_claude_models_and_legacy_codex_profile() {
     for (agent, model) in [
-        ("codex", "gpt-5.6-sol"),
+        ("codex", "gpt-6-sol"),
         ("claude", "claude-sonnet-5"),
         ("claude", "claude-opus-5"),
         ("claude", "custom-provider-model"),

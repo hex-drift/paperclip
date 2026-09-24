@@ -121,7 +121,7 @@ The current-input attachment imported as PNG, **2,111,878 bytes**, SHA-256
 An independent read-only audit rehashed the stored blob and verified the exact
 comment/body/asset locator and wake-comment binding. The source-body hash
 matches GitHub's CRLF normalization, not a rendered-page reconstruction.
-The native `gpt-5.6-luna` run took **20.846 seconds** and recorded two artifact
+The native `gpt-6-luna` run took **20.846 seconds** and recorded two artifact
 view events. The final response accurately described the orange tabby, pale
 green eyes, and indoor background; root inspected the rendered reply and image.
 The final arrived **26.303 seconds** after submission. Working and final

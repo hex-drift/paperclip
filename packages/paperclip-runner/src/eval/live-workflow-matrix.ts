@@ -76,7 +76,7 @@ export const RUNNER_LIVE_CANDIDATE_SLOTS: readonly RunnerLiveCandidateSlot[] =
           slotId: "codex-strong",
           adapter: "codex_app_server",
           provider: "codex",
-          model: "gpt-5.6-luna",
+          model: "gpt-6-luna",
           tier: "strong",
           reasoningEffort: "medium",
           qualification: { requiredEnvironment: ["OPENAI_API_KEY"] },
@@ -202,7 +202,7 @@ export const RUNNER_LIVE_CANDIDATE_SLOTS: readonly RunnerLiveCandidateSlot[] =
           slotId: "acpx-codex",
           adapter: "acpx_runtime",
           provider: "acpx",
-          model: "gpt-5.6-sol",
+          model: "gpt-6-sol",
           tier: "strong",
           reasoningEffort: "medium",
           qualification: {

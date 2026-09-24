@@ -8,7 +8,7 @@ import {
 describe("model pricing", () => {
   it("prices uncached, cached, and output tokens with explicit provenance", () => {
     expect(
-      estimateModelCostNanodollars("gpt-5.6-sol", {
+      estimateModelCostNanodollars("gpt-6-sol", {
         inputTokens: 1_000,
         cachedInputTokens: 400,
         outputTokens: 100,
@@ -31,7 +31,7 @@ describe("model pricing", () => {
   });
 
   it.each([
-    ["gpt-5.6-luna", 0.2, 0.02, 1.2],
+    ["gpt-6-luna", 0.2, 0.02, 1.2],
     ["claude-sonnet-5", 2, 0.2, 10],
     ["openrouter/anthropic/claude-sonnet-5", 2, 0.2, 10],
     ["openrouter/qwen/qwen3.8-max-0902", 2, 0.25, 6],

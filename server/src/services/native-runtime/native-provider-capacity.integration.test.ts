@@ -54,7 +54,7 @@ describe("native provider capacity failure persistence", () => {
       name: "Native capacity agent",
       status: "active",
       adapterType: "paperclip_runner",
-      adapterConfig: { provider: "codex", model: "gpt-5.6-luna" },
+      adapterConfig: { provider: "codex", model: "gpt-6-luna" },
     });
   });
 
@@ -139,7 +139,7 @@ describe("native provider capacity failure persistence", () => {
           agentId,
           executionWorkspaceId: runId,
         },
-        provider: { kind: "codex", model: "gpt-5.6-luna" },
+        provider: { kind: "codex", model: "gpt-6-luna" },
         task: {
           identifier: issueId,
           title: issue.title,

@@ -813,7 +813,7 @@ describe("AgentConfigForm environment selector", () => {
 
   it("renders GPT-6 Astra and its model-specific reasoning efforts", async () => {
     mockAgentsApi.adapterModels.mockResolvedValue([
-      { id: "gpt-5.6-sol", label: "gpt-5.6-sol" },
+      { id: "gpt-6-sol", label: "gpt-6-sol" },
       { id: "gpt-6-astra", label: "gpt-6-astra" },
     ]);
     const result = await renderForm(
@@ -846,14 +846,14 @@ describe("AgentConfigForm environment selector", () => {
 
   it("removes a legacy incompatible effort when the model changes to Astra", async () => {
     mockAgentsApi.adapterModels.mockResolvedValue([
-      { id: "gpt-5.6-sol", label: "gpt-5.6-sol" },
+      { id: "gpt-6-sol", label: "gpt-6-sol" },
       { id: "gpt-6-astra", label: "gpt-6-astra" },
     ]);
     const result = await renderForm(
       [makeEnvironment({ id: "local-1", name: "Local", driver: "local" })],
       {
         adapterConfig: {
-          model: "gpt-5.6-sol",
+          model: "gpt-6-sol",
           reasoningEffort: "minimal",
         },
       },
@@ -861,7 +861,7 @@ describe("AgentConfigForm environment selector", () => {
     roots.push(result.root);
 
     const modelButton = Array.from(result.container.querySelectorAll("button"))
-      .find((button) => button.textContent?.trim() === "gpt-5.6-sol");
+      .find((button) => button.textContent?.trim() === "gpt-6-sol");
     expect(modelButton).not.toBeUndefined();
     await act(async () => {
       modelButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));

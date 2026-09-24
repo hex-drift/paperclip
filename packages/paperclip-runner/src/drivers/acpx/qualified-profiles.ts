@@ -75,8 +75,8 @@ export const QUALIFIED_ACPX_PROFILES: Readonly<
     agentRuntimeVersion: "0.156.0",
     commandDigest:
       "sha256:c4538599d1ab767db5dff50934f13bb5ba313a59d9c4a83e993fac4617ea63d3",
-    qualificationModel: "gpt-5.6-sol",
-    reportedModelId: "gpt-5.6-sol",
+    qualificationModel: "gpt-6-sol",
+    reportedModelId: "gpt-6-sol",
     permissionPolicy: "interactive",
   },
 });

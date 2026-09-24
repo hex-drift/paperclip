@@ -16,7 +16,7 @@ export const CLAUDE_MANAGED_BETA_VERSION = "managed-agents-2026-04-01" as const;
 
 export const QUALIFIED_ACPX_RUNNER_MODELS = {
   claude: "claude-sonnet-5",
-  codex: "gpt-5.6-sol",
+  codex: "gpt-6-sol",
 } as const;
 
 export type QualifiedPaperclipRunnerAcpxAgent =

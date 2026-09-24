@@ -468,7 +468,7 @@ describe("native execution input external-chat framing", () => {
       normalizedSessionId: resumedSession ? "60000000-0000-4000-8000-000000000006" : null,
       provider, resumedSession,
       acpxAgent: "claude",
-      model: provider === "acpx" ? "claude-sonnet-5" : provider === "opencode" ? "openai/gpt-5.5" : "gpt-5.6-sol",
+      model: provider === "acpx" ? "claude-sonnet-5" : provider === "opencode" ? "openai/gpt-5.5" : "gpt-6-sol",
       completionContract: {
         id: "70000000-0000-4000-8000-000000000007", sha256: `sha256:${"a".repeat(64)}`, schemaVersion: "paperclip.run-result.v1",
         contract: { revision: "1", objective: "Write a welcome after the user's answer", criteria: [{ id: "objective", requirement: "Use the selected tone" }] },

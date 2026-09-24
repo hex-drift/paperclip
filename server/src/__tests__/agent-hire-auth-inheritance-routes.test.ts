@@ -485,7 +485,7 @@ describeEmbeddedPostgres("hired agent provider credential inheritance", () => {
   it("rejects native runtime inheritance across companies", async () => {
     const parentCompanyId = await seedCompany();
     const targetCompanyId = await seedCompany();
-    const parent = await seedParentAgent(parentCompanyId, "paperclip_runner", { provider: "codex", model: "gpt-5.6-sol" });
+    const parent = await seedParentAgent(parentCompanyId, "paperclip_runner", { provider: "codex", model: "gpt-6-sol" });
     const res = await hire(agentActor(targetCompanyId, parent.id), targetCompanyId, {
       name: "Cross Company Inheritance Attempt", role: "engineer", adapterType: "paperclip_runner", inheritRuntimeFrom: "caller",
     });

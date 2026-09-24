@@ -508,7 +508,7 @@ describe("codex_local ACP lane", () => {
     });
   });
 
-  it.each([["gpt-6-astra", "ultra"], ["gpt-6-sol", "ultra"], ["gpt-6-luna", "max"], ["gpt-5.6-sol", "ultra"], ["gpt-5.6-terra", "ultra"], ["gpt-5.6-luna", "max"]])("forwards %s controls to the ACPX Codex target", (model, effort) => {
+  it.each([["gpt-6-astra", "ultra"], ["gpt-6-sol", "ultra"], ["gpt-6-luna", "max"], ["gpt-5.6-terra", "ultra"]])("forwards %s controls to the ACPX Codex target", (model, effort) => {
     expect(buildCodexAcpConfig({
       engine: "acp",
       model,
@@ -521,9 +521,9 @@ describe("codex_local ACP lane", () => {
     });
   });
 
-  it("normalizes the legacy bare gpt-5.6 alias to gpt-5.6-sol", () => {
+  it("normalizes the legacy bare gpt-5.6 alias to gpt-6-sol", () => {
     expect(buildCodexAcpConfig({ engine: "acp", model: "gpt-5.6" })).toMatchObject({
-      model: "gpt-5.6-sol",
+      model: "gpt-6-sol",
     });
   });
 

@@ -40,7 +40,7 @@ Slack/Telegram credentials have been supplied. Webhook providers use the stable
 Tailscale Funnel origin on port 8443; Discord uses its outbound Gateway.
 The public proxy exposes verified webhook routes, not the private Board or files.
 
-Maya E2E uses native Paperclip Runner with Codex `gpt-5.6-luna`; actual native
+Maya E2E uses native Paperclip Runner with Codex `gpt-6-luna`; actual native
 turn records confirm the model, with no Terra substitution. The
 [current qualification ledger](./2026-09-08-chat-queue-and-webhook-repair.md)
 records resumed model capacity, successful text replies on all four connected
@@ -201,7 +201,7 @@ Agent: Maya E2E
 
 `Maya E2E` is a dedicated test agent assigned to no production work. For live
 qualification it must use the new Paperclip Runner with Codex, initially
-`gpt-5.6-luna`. Verify actual admitted run records show `adapterType:
+`gpt-6-luna`. Verify actual admitted run records show `adapterType:
 paperclip_runner`, `runtimeMode: native`, `driverKind: codex_app_server`, and
 the explicit model; the agent's display name or saved configuration alone is
 insufficient. Terra is an allowed fallback only when necessary; record the

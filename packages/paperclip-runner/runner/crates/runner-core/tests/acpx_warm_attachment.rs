@@ -80,7 +80,7 @@ fn checkpoints_the_sidecar_and_rebinds_consecutive_warm_runs_before_accepting_wo
     };
     let mut descriptor = json!({
         "kind": "acpx", "provider": "acpx", "driver": "acpx_runtime",
-        "providerVersion": "0.13.1", "agent": "codex", "model": "gpt-5.6-sol",
+        "providerVersion": "0.13.1", "agent": "codex", "model": "gpt-6-sol",
         "acpxVersion": "0.13.1", "agentServerPackage": "@agentclientprotocol/codex-acp",
         "agentServerVersion": "1.6.2", "agentRuntimePackage": "@openai/codex",
         "agentRuntimeVersion": "0.156.0", "commandDigest": PROFILE_DIGEST,

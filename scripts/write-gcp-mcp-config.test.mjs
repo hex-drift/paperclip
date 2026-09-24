@@ -80,7 +80,7 @@ test("configures the remote code-review graph and AI Gate provider", async () =>
     provider: { npm: "@ai-sdk/anthropic" },
     name: "Claude Opus 5",
   });
-  assert.deepEqual(opencode.provider["ai-gate"].models["gpt-5.6-sol"], {
+  assert.deepEqual(opencode.provider["ai-gate"].models["gpt-6-sol"], {
     name: "GPT 5 6 Sol",
   });
   assert.deepEqual(opencode.provider["ai-gate"].models["kimi-k3-256k"], {

@@ -438,7 +438,7 @@ describe("ACPX runtime host", () => {
         {
           ...fixture.options,
           agent: "codex",
-          model: "gpt-5.6-sol",
+          model: "gpt-6-sol",
           permissionMode: "deny-all",
           signal: controller.signal,
         },
@@ -497,7 +497,7 @@ describe("ACPX runtime host", () => {
         {
           ...fixture.options,
           agent: "codex",
-          model: "gpt-5.6-sol",
+          model: "gpt-6-sol",
           permissionMode: "deny-all",
           signal: controller.signal,
         },
@@ -537,7 +537,7 @@ describe("ACPX runtime host", () => {
         {
           ...fixture.options,
           agent: "codex",
-          model: "gpt-5.6-sol",
+          model: "gpt-6-sol",
           permissionMode: "deny-all",
           environment: { PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET: "{}" },
           signal: controller.signal,
@@ -566,7 +566,7 @@ describe("ACPX runtime host", () => {
       {
         ...fixture.options,
         agent: "codex",
-        model: "gpt-5.6-sol",
+        model: "gpt-6-sol",
         permissionMode: "deny-all",
         environment: { PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET: "{}" },
       },
@@ -597,7 +597,7 @@ describe("ACPX runtime host", () => {
       {
         ...fixture.options,
         agent: "codex",
-        model: "gpt-5.6-sol",
+        model: "gpt-6-sol",
         permissionMode: "approve-reads",
         environment: {
           PATH: process.env.PATH,
@@ -611,7 +611,7 @@ describe("ACPX runtime host", () => {
     expect(host.identity()).toMatchObject({
       schema: "paperclip.runner.acpx-identity.v2",
       acpxRecordId: "record-1",
-      requestedModel: "gpt-5.6-sol",
+      requestedModel: "gpt-6-sol",
       permissionMode: "approve-reads",
     });
     const lifetimeFenceCandidates =
@@ -650,7 +650,7 @@ describe("ACPX runtime host", () => {
         {
           ...fixture.options,
           agent: "codex",
-          model: "gpt-5.6-sol",
+          model: "gpt-6-sol",
           permissionMode: "approve-reads",
           environment: {
             PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET: "{}",
@@ -676,7 +676,7 @@ describe("ACPX runtime host", () => {
       {
         ...fixture.options,
         agent: "codex",
-        model: "gpt-5.6-sol",
+        model: "gpt-6-sol",
         permissionMode: "deny-all",
         environment: { PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET: "{}" },
         semanticTools: {
@@ -861,7 +861,7 @@ describe("ACPX runtime host", () => {
         {
           ...fixture.options,
           agent: "codex",
-          model: "gpt-5.6-sol",
+          model: "gpt-6-sol",
           permissionMode: "approve-all",
           environment: {
             PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET:
@@ -905,7 +905,7 @@ describe("ACPX runtime host", () => {
         {
           ...fixture.options,
           agent: "codex",
-          model: "gpt-5.6-sol",
+          model: "gpt-6-sol",
           permissionMode: "approve-all",
           environment: {
             PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET:
@@ -969,7 +969,7 @@ describe("ACPX runtime host", () => {
         {
           ...fixture.options,
           agent: "codex",
-          model: "gpt-5.6-sol",
+          model: "gpt-6-sol",
           permissionMode: "approve-all",
           environment: { PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET: "{}" },
         },
@@ -1005,7 +1005,7 @@ describe("ACPX runtime host", () => {
         {
           ...fixture.options,
           agent: "codex",
-          model: "gpt-5.6-sol",
+          model: "gpt-6-sol",
           permissionMode: "approve-all",
           environment: { PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET: "{}" },
         },
@@ -1039,7 +1039,7 @@ describe("ACPX runtime host", () => {
       {
         ...fixture.options,
         agent: "codex",
-        model: "gpt-5.6-sol",
+        model: "gpt-6-sol",
         permissionMode: "approve-all",
         environment: {
           PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET: "{}",
@@ -1091,7 +1091,7 @@ describe("ACPX runtime host", () => {
       {
         ...fixture.options,
         agent: "codex",
-        model: "gpt-5.6-sol",
+        model: "gpt-6-sol",
         permissionMode: "approve-all",
         environment: { PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET: "{}" },
       },
@@ -1145,7 +1145,7 @@ describe("ACPX runtime host", () => {
       {
         ...fixture.options,
         agent: "codex",
-        model: "gpt-5.6-sol",
+        model: "gpt-6-sol",
         permissionMode: "approve-all",
         environment: { PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET: "{}" },
       },
@@ -1177,7 +1177,7 @@ describe("ACPX runtime host", () => {
       {
         ...fixture.options,
         agent: "codex",
-        model: "gpt-5.6-sol",
+        model: "gpt-6-sol",
         permissionMode: "approve-all",
         environment: { PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET: "{}" },
       },
@@ -1206,7 +1206,7 @@ describe("ACPX runtime host", () => {
       {
         ...fixture.options,
         agent: "codex",
-        model: "gpt-5.6-sol",
+        model: "gpt-6-sol",
         permissionMode: "approve-reads",
         environment: { PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET: "{}" },
       },
@@ -1247,7 +1247,7 @@ describe("ACPX runtime host", () => {
       {
         ...fixture.options,
         agent: "codex",
-        model: "gpt-5.6-sol",
+        model: "gpt-6-sol",
         permissionMode: "approve-reads",
         environment: { PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET: "{}" },
       },
@@ -1275,7 +1275,7 @@ describe("ACPX runtime host", () => {
         {
           ...fixture.options,
           agent: "codex",
-          model: "gpt-5.6-sol",
+          model: "gpt-6-sol",
           permissionMode: "approve-reads",
           environment: { PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET: "{}" },
         },
@@ -1314,7 +1314,7 @@ describe("ACPX runtime host", () => {
       {
         ...fixture.options,
         agent: "codex",
-        model: "gpt-5.6-sol",
+        model: "gpt-6-sol",
         permissionMode: "approve-reads",
         environment: { PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET: "{}" },
       },
@@ -1367,7 +1367,7 @@ describe("ACPX runtime host", () => {
       {
         ...fixture.options,
         agent: "codex",
-        model: "gpt-5.6-sol",
+        model: "gpt-6-sol",
         permissionMode: "approve-reads",
         environment: { PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET: "{}" },
       },
@@ -1481,7 +1481,7 @@ describe("ACPX runtime host", () => {
         {
           ...fixture.options,
           agent: "codex",
-          model: "gpt-5.6-sol",
+          model: "gpt-6-sol",
           permissionMode: "deny-all",
           signal: controller.signal,
         },
@@ -1553,7 +1553,7 @@ describe("ACPX runtime host", () => {
         {
           ...fixture.options,
           agent: "codex",
-          model: "gpt-5.6-sol",
+          model: "gpt-6-sol",
           permissionMode: "deny-all",
           environment: {
             PAPERCLIP_ACPX_CODEX_AUTH_JSON_SECRET: "{}",
@@ -1637,7 +1637,7 @@ describe("ACPX runtime host", () => {
         {
           ...fixture.options,
           agent: "codex",
-          model: "gpt-5.6-sol",
+          model: "gpt-6-sol",
           permissionMode: "deny-all",
           signal: controller.signal,
         },
@@ -1688,8 +1688,8 @@ function runtimePort(
       input.getStatus ??
       (async () => ({
         models: {
-          currentModelId: "gpt-5.6-sol",
-          availableModelIds: ["gpt-5.6-sol"],
+          currentModelId: "gpt-6-sol",
+          availableModelIds: ["gpt-6-sol"],
         },
       })),
     ...(input.setModel ? { setModel: input.setModel } : {}),

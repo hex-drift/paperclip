@@ -595,7 +595,7 @@ describe("ACPX installation integrity", () => {
   it.runIf(process.platform === "linux" && process.arch === "x64")(
     "resolves and pins the qualified Codex native runtime through its transitive packages",
     async () => {
-      const profile = resolveQualifiedAcpxProfile("codex", "gpt-5.6-sol");
+      const profile = resolveQualifiedAcpxProfile("codex", "gpt-6-sol");
       const installation = await verifyQualifiedAcpxInstallation(profile);
       expect(installation.agentRuntimePackageJsonPath).toContain(
         "/@openai/codex/package.json",

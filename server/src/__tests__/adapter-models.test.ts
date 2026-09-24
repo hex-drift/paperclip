@@ -50,9 +50,9 @@ describe("adapter model listing", () => {
     expect(models).toEqual(codexFallbackModels);
     // The bare gpt-5.6 alias is intentionally not advertised (Codex has no metadata for it).
     expect(models.some((model) => model.id === "gpt-5.6")).toBe(false);
-    expect(models.some((model) => model.id === "gpt-5.6-sol")).toBe(true);
+    expect(models.some((model) => model.id === "gpt-6-sol")).toBe(true);
     expect(models.some((model) => model.id === "gpt-5.6-terra")).toBe(true);
-    expect(models.some((model) => model.id === "gpt-5.6-luna")).toBe(true);
+    expect(models.some((model) => model.id === "gpt-6-luna")).toBe(true);
     expect(models.some((model) => model.id === "gpt-5.3-codex-spark")).toBe(false);
     expect(fetchSpy).not.toHaveBeenCalled();
   });
@@ -191,7 +191,7 @@ describe("adapter model listing", () => {
     const models = await listAdapterModels("cursor");
     expect(models.map((model) => model.id)).toEqual(expect.arrayContaining([
       "composer-2.5", "claude-opus-5-5", "claude-fable-5-1", "claude-sonnet-5",
-      "gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna", "grok-4.7", "gemini-3.8-flash", "muse-spark-1.3",
+      "gpt-6-sol", "gpt-5.6-terra", "gpt-6-luna", "grok-4.7", "gemini-3.8-flash", "muse-spark-1.3",
     ]));
   });
 
@@ -238,7 +238,7 @@ describe("adapter model listing", () => {
     expect(fetchSpy).toHaveBeenCalledTimes(2);
     expect(initial.some((model) => model.id === "gpt-5")).toBe(true);
     expect(refreshed.some((model) => model.id === "gpt-5.6-terra")).toBe(true);
-    expect(refreshed.some((model) => model.id === "gpt-5.6-luna")).toBe(true);
+    expect(refreshed.some((model) => model.id === "gpt-6-luna")).toBe(true);
   });
 
   it("falls back to static codex models when OpenAI model discovery fails", async () => {
@@ -272,7 +272,7 @@ describe("adapter model listing", () => {
     const models = await listAdapterModels("opencode_local");
 
     expect(models).toEqual(opencodeFallbackModels);
-    expect(models.map((model) => model.id)).toEqual(expect.arrayContaining(["openai/gpt-6-astra", "openai/gpt-6-sol", "openai/gpt-6-luna", "openai/gpt-5.6-sol", "openai/gpt-5.6-terra", "openai/gpt-5.6-luna", "anthropic/claude-opus-5-5", "anthropic/claude-opus-5", "anthropic/claude-fable-5-1", "anthropic/claude-sonnet-5", "google/gemini-3.8-flash", "xai/grok-4.7"]));
+    expect(models.map((model) => model.id)).toEqual(expect.arrayContaining(["openai/gpt-6-astra", "openai/gpt-6-sol", "openai/gpt-6-luna", "openai/gpt-6-sol", "openai/gpt-5.6-terra", "openai/gpt-6-luna", "anthropic/claude-opus-5-5", "anthropic/claude-opus-5", "anthropic/claude-fable-5-1", "anthropic/claude-sonnet-5", "google/gemini-3.8-flash", "xai/grok-4.7"]));
   });
 
   it("loads cursor models dynamically and caches them", async () => {

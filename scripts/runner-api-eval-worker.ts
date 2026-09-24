@@ -97,7 +97,7 @@ try {
         usage = { inputTokens: 0, outputTokens: 0, cachedInputTokens: 0, estimatedCostNanodollars: 0, providerRequests: 0, accountingProvenance: "Provider-free direct authority contract; no provider or runnerd dispatched" };
       } else {
         if (request.model === "claude-sonnet-5" && (process.platform !== "linux" || process.arch !== "x64")) throw new Error("Qualified ACPX Claude requires Linux x64; no provider turn was dispatched");
-        if (!request.reservationId || request.maxCostUsd !== 0.5 || !["gpt-5.6-luna", "claude-sonnet-5", ...OPENROUTER_MODELS].includes(request.model)) throw new Error("Paid attempt requires ledger reservation and qualified model");
+        if (!request.reservationId || request.maxCostUsd !== 0.5 || !["gpt-6-luna", "claude-sonnet-5", ...OPENROUTER_MODELS].includes(request.model)) throw new Error("Paid attempt requires ledger reservation and qualified model");
         if (isOpenRouter) {
           providerVersion = execFileSync(resolve("packages/paperclip-runner/node_modules/opencode-ai/bin/opencode.exe"), ["--version"], { encoding: "utf8" }).trim();
           if (providerVersion !== "1.18.32") throw new Error("OpenCode profile requires version 1.18.32");
@@ -110,7 +110,7 @@ try {
         bundle = createRunnerdCodexTransport({
           provider, acpxAgent: "claude", acpxPermissionMode: "approve-reads",
           environment: { ...providerEnvironment, PAPERCLIP_PROVIDER_TRACE_PATH: join(directory, "provider-trace.jsonl"), PAPERCLIP_PROVIDER_TRACE_MAX_BYTES: String(32 * 1024 * 1024) },
-          codexCommand: request.model === "gpt-5.6-luna" ? realpathSync(execFileSync("which", ["codex"], { encoding: "utf8" }).trim()) : undefined,
+          codexCommand: request.model === "gpt-6-luna" ? realpathSync(execFileSync("which", ["codex"], { encoding: "utf8" }).trim()) : undefined,
           sourceCodexHome: process.env.CODEX_HOME ?? join(homedir(), ".codex"),
           runnerBinary: defaultCapabilityRunnerdBinary(), stateDirectory: join(server.root, `runner-${request.attemptId}`),
           lifecyclePolicy: { mode: "per_turn", idleTimeoutMs: null },
@@ -205,7 +205,7 @@ try {
       requestedModel: request.calls ? "provider-free" : request.model ?? "provider-free", provider: request.calls ? "none" : provider, driver: request.calls ? "direct-authority-contract" : "real-server-api-tools",
       evidenceMode: request.calls ? "provider-free-contract" : "live-provider",
       providerSessionId: record(thread.thread).id ?? null, effectiveModel: record(thread.thread).model ?? null,
-      providerVersion: request.calls ? null : request.model === "gpt-5.6-luna" ? execFileSync("codex", ["--version"], { encoding: "utf8" }).trim() : providerVersion ?? record(evidence).providerVersion ?? null,
+      providerVersion: request.calls ? null : request.model === "gpt-6-luna" ? execFileSync("codex", ["--version"], { encoding: "utf8" }).trim() : providerVersion ?? record(evidence).providerVersion ?? null,
       runtimeVersions: { node: process.versions.node, acpx: record(evidence).providerVersion, agentServer: record(evidence).agentServerVersion, agentRuntime: record(evidence).agentRuntimeVersion },
       runtimeBuild,
       timing: { startedAt, finishedAt: new Date().toISOString(), durationMs: performance.now() - started },

@@ -491,20 +491,20 @@ describe("shared ACPX engine runtime behavior", () => {
   it("sets Codex model, effort, and fast mode through CODEX_CONFIG without session config calls", async () => {
     const { configOptions, meta } = await runExecutor({
       agent: "codex",
-      model: "gpt-5.6-sol",
+      model: "gpt-6-sol",
       modelReasoningEffort: "high",
       fastMode: true,
     });
 
     expect(JSON.parse(String((meta[0]?.env as Record<string, string>).CODEX_CONFIG))).toEqual({
-      model: "gpt-5.6-sol",
+      model: "gpt-6-sol",
       model_reasoning_effort: "high",
       service_tier: "fast",
       features: { fast_mode: true },
     });
     expect(configOptions).toEqual([]);
     expect(meta[0]?.commandNotes).toContain(
-      "Requested ACPX model: gpt-5.6-sol (set via CODEX_CONFIG at startup).",
+      "Requested ACPX model: gpt-6-sol (set via CODEX_CONFIG at startup).",
     );
   });
 

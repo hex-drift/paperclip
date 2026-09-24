@@ -721,7 +721,7 @@ const recoveryFakeCodex = resolve(
         return {
           ...value,
           schema: "paperclip.native-execution-input.v2",
-          provider: { kind: "codex", model: "gpt-5.6-luna" },
+          provider: { kind: "codex", model: "gpt-6-luna" },
           completionContract: {
             ...value.completionContract,
             contract: {
@@ -2510,7 +2510,7 @@ describe("buildNativeExecutionInput wake projection", () => {
     const defaultAcpx = buildNativeExecutionInput({
       ...common,
       provider: "acpx",
-      model: "gpt-5.6-sol",
+      model: "gpt-6-sol",
     });
 
     expect(codex).toMatchObject({

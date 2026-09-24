@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { codexReasoningEffortOptions } from "./codex-reasoning-effort";
 
 describe("codexReasoningEffortOptions", () => {
-  it.each(["gpt-6-astra", "gpt-6-sol", "gpt-5.6-sol", "gpt-5.6-terra"])("exposes only the supported %s reasoning efforts", (model) => {
+  it.each(["gpt-6-astra", "gpt-6-sol", "gpt-5.6-terra"])("exposes only the supported %s reasoning efforts", (model) => {
     expect(codexReasoningEffortOptions(model)).toEqual([
       { value: "", label: "Default" },
       { value: "low", label: "Low" },
@@ -16,7 +16,7 @@ describe("codexReasoningEffortOptions", () => {
     ]);
   });
 
-  it.each(["gpt-6-luna", "gpt-5.6-luna"])("caps %s at Max", (model) => {
+  it.each(["gpt-6-luna", "gpt-6-luna"])("caps %s at Max", (model) => {
     expect(codexReasoningEffortOptions(model).map((option) => option.value)).toEqual([
       "", "low", "medium", "high", "xhigh", "max",
     ]);

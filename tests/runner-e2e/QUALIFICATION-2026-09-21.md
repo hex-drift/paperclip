@@ -12,7 +12,7 @@ with **26/26 cleanup passes**. The 13 cases ran on both native Codex and native
 Claude: interviews, clear/ambiguous requests, plain messages, explicit plans,
 ordinary-task isolation, plan acceptance, card/reply acceptance, acceptance during
 active work, clarification, revision, and rejection. The observed completed models
-were `gpt-5.6-sol` and `claude-sonnet-5`; some Codex first-response cases stop on an
+were `gpt-6-sol` and `claude-sonnet-5`; some Codex first-response cases stop on an
 answerable native question before model metadata is emitted.
 
 The real wizard creates the agent. The existing fixture switches its runtime
@@ -120,7 +120,7 @@ honest uncertainty, useful next step, and clear prose. No production prompt chan
 
 [Campaign 35659014397](https://github.com/paperclipai/paperclip/actions/runs/35659014397)
 on `cf6d4ae3a8576d822861bc916e7f536d0a0b7bc7`: **2/2 passed**, both
-cleanup passes, using `gpt-5.6-sol` and `claude-sonnet-5`.
+cleanup passes, using `gpt-6-sol` and `claude-sonnet-5`.
 
 The boundary snapshot proves the original worker was running with a saved draft.
 Chat then reassigns the existing task to a second agent. The original stops with

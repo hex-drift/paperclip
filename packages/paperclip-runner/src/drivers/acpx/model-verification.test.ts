@@ -7,8 +7,8 @@ describe("ACPX qualified model verification", () => {
   it("accepts an exact model already reported by the provider", async () => {
     const getStatus = vi.fn(async () => ({
       models: {
-        currentModelId: "gpt-5.6-sol",
-        availableModelIds: ["gpt-5.6-sol"],
+        currentModelId: "gpt-6-sol",
+        availableModelIds: ["gpt-6-sol"],
       },
     }));
     const setModel = vi.fn(async () => undefined);
@@ -16,10 +16,10 @@ describe("ACPX qualified model verification", () => {
     await expect(
       requireVerifiedAcpxModel(
         { getStatus, setModel },
-        resolveQualifiedAcpxProfile("codex", "gpt-5.6-sol"),
+        resolveQualifiedAcpxProfile("codex", "gpt-6-sol"),
       ),
     ).resolves.toMatchObject({
-      models: { currentModelId: "gpt-5.6-sol" },
+      models: { currentModelId: "gpt-6-sol" },
     });
     expect(setModel).not.toHaveBeenCalled();
   });
@@ -84,20 +84,20 @@ describe("ACPX qualified model verification", () => {
     });
     const getStatus = vi.fn(async () => ({
       models: {
-        currentModelId: selected ? "gpt-5.6-sol" : "default",
-        availableModelIds: ["default", "gpt-5.6-sol"],
+        currentModelId: selected ? "gpt-6-sol" : "default",
+        availableModelIds: ["default", "gpt-6-sol"],
       },
     }));
 
     await requireVerifiedAcpxModel(
       { getStatus, setModel },
-      resolveQualifiedAcpxProfile("codex", "gpt-5.6-sol"),
+      resolveQualifiedAcpxProfile("codex", "gpt-6-sol"),
     );
-    expect(setModel).toHaveBeenCalledWith("gpt-5.6-sol");
+    expect(setModel).toHaveBeenCalledWith("gpt-6-sol");
   });
 
   it("fails closed when status or model selection is unavailable", async () => {
-    const profile = resolveQualifiedAcpxProfile("codex", "gpt-5.6-sol");
+    const profile = resolveQualifiedAcpxProfile("codex", "gpt-6-sol");
     await expect(requireVerifiedAcpxModel({}, profile)).rejects.toThrow(
       /cannot verify its effective model/,
     );

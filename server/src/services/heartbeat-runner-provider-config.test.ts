@@ -11,11 +11,11 @@ describe("Paperclip Runner native provider configuration", () => {
     expect(
       resolvePaperclipRunnerNativeProviderInput({
         backend: "codex_app_server",
-        adapterConfig: { provider: "codex", model: "gpt-5.6-sol" },
+        adapterConfig: { provider: "codex", model: "gpt-6-sol" },
       }),
     ).toEqual({
       provider: "codex",
-      model: "gpt-5.6-sol",
+      model: "gpt-6-sol",
       codexApprovalPolicy: "never",
     });
     expect(() =>
@@ -129,7 +129,7 @@ describe("Paperclip Runner native provider configuration", () => {
 
   it.each([
     ["claude", "claude-sonnet-5", "approve-all"],
-    ["codex", "gpt-5.6-sol", "deny-all"],
+    ["codex", "gpt-6-sol", "deny-all"],
   ] as const)(
     "projects the qualified ACPX %s descriptor from adapter config",
     (acpxAgent, model, acpxPermissionMode) => {

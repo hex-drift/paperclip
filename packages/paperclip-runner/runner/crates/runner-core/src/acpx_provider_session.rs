@@ -74,7 +74,7 @@ impl AcpxProviderSessionConfig {
         self.transport.validate()?;
         let qualified_model = match self.agent.as_str() {
             "claude" => "claude-sonnet-5",
-            "codex" => "gpt-5.6-sol",
+            "codex" => "gpt-6-sol",
             _ => {
                 return Err(LocalRunnerError::invalid(
                     "ACPX agent must be claude or codex",

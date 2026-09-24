@@ -756,7 +756,7 @@ finished internally with zero authored comments. Fresh requests answered once:
 Discord stayed on CHA-43; Telegram created CHA-50. Slack and GitHub short
 requests also answered once. Short ingress-to-final times were 13.336–21.654s.
 Every live83 run records native `codex_app_server` and execution-input model
-`gpt-5.6-luna`.
+`gpt-6-luna`.
 
 This pass also achieved real local queue overlap in Slack and GitHub. Each
 follow-up arrived while its first run was active, showed a durable queued
@@ -1859,7 +1859,7 @@ Gateway. No new live provider conversation or Teams tenant proof is implied.
   results are not live Discord button qualification.
 - **Native reasoning effort (audit complete):** legacy `modelReasoningEffort`
   is not a supported field in the closed native v4 provider contract. The five
-  latest succeeded runs freeze `{kind: codex, model: gpt-5.6-luna,
+  latest succeeded runs freeze `{kind: codex, model: gpt-6-luna,
 approvalPolicy: never}`. Injecting an effort field is rejected; resolving
   legacy low versus high yields the same native profile. This is a missing
   native capability, not a proved dropped supported setting. A future explicit
@@ -1876,7 +1876,7 @@ has been sent during this code-only audit.
 
 Maya E2E `31f56712-3944-423e-b7c7-404bb8fbb993`, company
 `7ffa9799-0b1b-4a26-9b44-8e897f832f89`, uses native
-`paperclip_runner` / `codex_app_server` / `gpt-5.6-luna`. Terra was not
+`paperclip_runner` / `codex_app_server` / `gpt-6-luna`. Terra was not
 substituted. Effective reasoning effort is not yet proved; the old configured
 low field is outside the native v4 contract. Do not claim it is running low effort.
 

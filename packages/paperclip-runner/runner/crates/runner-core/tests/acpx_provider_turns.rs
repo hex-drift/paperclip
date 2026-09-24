@@ -37,7 +37,7 @@ fn config(mode: &str) -> AcpxProviderSessionConfig {
             shutdown_grace: Duration::from_millis(100),
         },
         agent: "codex".to_owned(),
-        model: "gpt-5.6-sol".to_owned(),
+        model: "gpt-6-sol".to_owned(),
         run_id: "run-1".to_owned(),
         catalog_revision: 1,
         runtime_directory: std::env::temp_dir(),

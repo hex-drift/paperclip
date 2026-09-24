@@ -327,7 +327,7 @@ async function sandboxFixture(agent: "pi" | "claude" | "codex") {
   const models = {
     pi: "openrouter/deepseek/deepseek-v4-flash-0731",
     claude: "claude-sonnet-5",
-    codex: "gpt-5.6-sol",
+    codex: "gpt-6-sol",
   } as const;
   const binding = await createAcpxRecoveryBinding({
     runtimeDirectory,

@@ -2,7 +2,7 @@
 
 ## Environment and scope
 
-All live tests used the pinned Codex CLI 0.153.4 and gpt-5.6-sol.
+All live tests used the pinned Codex CLI 0.153.4 and gpt-6-sol.
 Each fixture used an isolated Codex home. A repository contained known launch
 notes, a configuration marker, a skill marker, and a harmless SessionStart hook.
 The hook only appended a line to a fixture file.

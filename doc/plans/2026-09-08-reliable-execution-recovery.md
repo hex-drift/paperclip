@@ -32,7 +32,7 @@ Five independent fresh source-CLI `test-drive` instances passed these browser jo
 | CEO descendant events | Native Codex driver with deterministic fixtures | Provider-confirmed descendant notifications do not crash or complete the root. |
 | Unsupported legacy recovery | Deterministic process adapter | Unknown action outcomes create an operator-owned recovery action. |
 
-These fixtures do not prove live provider authentication. A separate retained live instance completed the current Gmail request with native Codex and model `gpt-5.6-sol`: one search call and five thread reads. History, assignment, and existing connections were retained. No mail was sent. Private provider history, instance identifiers, and credentials are excluded from this repository.
+These fixtures do not prove live provider authentication. A separate retained live instance completed the current Gmail request with native Codex and model `gpt-6-sol`: one search call and five thread reads. History, assignment, and existing connections were retained. No mail was sent. Private provider history, instance identifiers, and credentials are excluded from this repository.
 
 The live journey required explicit operator reconciliation during diagnosis. It proves the repaired functional path, not a frictionless first attempt.
 

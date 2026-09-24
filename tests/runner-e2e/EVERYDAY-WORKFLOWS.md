@@ -36,7 +36,7 @@ See [controlled recovery tests](../runner-recovery/README.md).
 
 ## Matrix and running
 
-The local matrix has nine cases on native Codex `gpt-5.6-sol`, native ACPX Claude
+The local matrix has nine cases on native Codex `gpt-6-sol`, native ACPX Claude
 `claude-sonnet-5`, and native Codex `gpt-5.4-mini`: 27 cells. The two core profiles
 also declare build/revise, delegation, controller-restart, and skill-creation cases
 on Daytona: eight cells. Remote runner-process killing is not supported. For remote controller

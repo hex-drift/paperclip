@@ -203,8 +203,8 @@ describe("Codex app-server Codex driver", () => {
       agentSessionId: "agent-session-1",
       profileDigest: `sha256:${"a".repeat(64)}`,
       workspaceDigest: `sha256:${"b".repeat(64)}`,
-      requestedModel: "gpt-5.6-sol",
-      effectiveModel: "gpt-5.6-sol",
+      requestedModel: "gpt-6-sol",
+      effectiveModel: "gpt-6-sol",
       permissionMode: "approve-all",
       providerLifetimeFenceCandidates: [60_001, 60_002, 60_003],
     };

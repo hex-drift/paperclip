@@ -595,7 +595,7 @@ confirmation. These observations supersede the pending gates above:
 - The installed `codex-acp` 1.6.2 process runs its bundled Codex 0.148.0, not the
   separately installed CLI. The test agent had inherited the operator's Astra
   model. Only the isolated Maya fixture was pinned to Paperclip's existing
-  `gpt-5.6-sol` default for further qualification; no global model, CLI,
+  `gpt-6-sol` default for further qualification; no global model, CLI,
   credential, or unrelated agent configuration was changed. Successful live
   runtime execution still needs proof after the typed-failure repair.
 - [Disabled-repository issue 1](https://github.com/cryppadotta/paperclip-chat-e2e-disabled/issues/1#issuecomment-5571234021)

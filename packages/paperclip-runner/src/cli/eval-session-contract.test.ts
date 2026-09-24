@@ -22,7 +22,7 @@ function request(overrides: Record<string, unknown> = {}): unknown {
     schema: "paperclip-runner/eval-session-request/v1",
     attemptId: "attempt-1",
     prompt: "Inspect the governed task.",
-    model: "gpt-5.6-sol",
+    model: "gpt-6-sol",
     provider: "codex",
     runnerd: { path: "/tmp/paperclip-runnerd", sha256: "a".repeat(64) },
     limits: {
@@ -98,7 +98,7 @@ describe("eval-session request contract", () => {
     expect(parseEvalSessionRequest(request())).toMatchObject({
       provider: "codex",
       driver: "codex_app_server",
-      model: "gpt-5.6-sol",
+      model: "gpt-6-sol",
     });
     expect(parseEvalSessionRequest(request({
       provider: "acpx",
@@ -276,7 +276,7 @@ describe("eval-session usage", () => {
     const snapshot = {
       usageLedger: [receipt, { ...receipt }],
     } as unknown as CapabilityLiveSessionSnapshot;
-    expect(evalSessionUsage("gpt-5.6-sol", snapshot)).toMatchObject({
+    expect(evalSessionUsage("gpt-6-sol", snapshot)).toMatchObject({
       agentTurns: 1,
       providerRequests: 2,
       inputTokens: 1_000,
@@ -290,7 +290,7 @@ describe("eval-session usage", () => {
 
   it("fails closed when a completed turn has no usage receipt", () => {
     expect(() => evalSessionUsage(
-      "gpt-5.6-sol",
+      "gpt-6-sol",
       { usageLedger: [] } as unknown as CapabilityLiveSessionSnapshot,
     )).toThrow("omitted usage accounting");
   });

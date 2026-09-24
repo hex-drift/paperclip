@@ -679,7 +679,7 @@ describe("managed AI connections", () => {
     const [environment] = await db.insert(environments).values({ name: "Adoption sandbox", driver: "sandbox", config: { provider: "daytona" } }).returning();
     await settings.update({ defaultEnvironmentId: environment.id });
     const id = randomUUID();
-    await db.insert(agents).values({ id, companyId, name: "Runner adoption", adapterType: "paperclip_runner", adapterConfig: { provider: "codex", model: "gpt-5.6-sol" } });
+    await db.insert(agents).values({ id, companyId, name: "Runner adoption", adapterType: "paperclip_runner", adapterConfig: { provider: "codex", model: "gpt-6-sol" } });
     const account = await service.save(companyId, "alice", { provider: "openai", method: "api_key", ownership: "personal", name: "Runner adoption account", apiKey: "fixture-adoption-key", agentIds: [id], allAgents: false }, "fixture-adoption-key");
     await service.setDefault(companyId, "alice", account.grantId);
     const target = { kind: "remote", transport: "sandbox", remoteCwd: "/workspace", providerKey: "daytona", runner: { execute: vi.fn(async () => ({ exitCode: 0, stdout: "", stderr: "", timedOut: false })) } } as const;
@@ -709,7 +709,7 @@ describe("managed AI connections", () => {
       expect(saved.body.defaultEnvironmentId).toBeNull();
       expect(saved.body.runtimeConfig.aiConnection).toEqual(selected);
       expect(acquire).toHaveBeenCalledWith(expect.objectContaining({ companyId, environment: expect.objectContaining({ id: environment.id }) }));
-      expect(probe).toHaveBeenCalledWith(expect.objectContaining({ executionTarget: target, config: expect.objectContaining({ provider: "codex", model: "gpt-5.6-sol", managedAiConnection: expect.any(Object) }) }));
+      expect(probe).toHaveBeenCalledWith(expect.objectContaining({ executionTarget: target, config: expect.objectContaining({ provider: "codex", model: "gpt-6-sol", managedAiConnection: expect.any(Object) }) }));
       expect(providerRequest).toHaveBeenCalledWith("https://api.openai.com/v1/models", expect.objectContaining({
         headers: { Authorization: "Bearer fixture-adoption-key" },
         redirect: "error",

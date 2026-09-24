@@ -11,9 +11,9 @@ interface TokenRatesUsdPerMillion {
 const RATES: Readonly<Record<string, TokenRatesUsdPerMillion>> = Object.freeze({
   "gpt-5.4-mini": { input: 0.75, cachedInput: 0.075, output: 4.5 },
   "gpt-5.5": { input: 5, cachedInput: 0.5, output: 30 },
-  "gpt-5.6-sol": { input: 5, cachedInput: 0.5, output: 30 },
+  "gpt-6-sol": { input: 5, cachedInput: 0.5, output: 30 },
   "gpt-5.6-terra": { input: 2, cachedInput: 0.2, output: 12 },
-  "gpt-5.6-luna": { input: 0.2, cachedInput: 0.02, output: 1.2 },
+  "gpt-6-luna": { input: 0.2, cachedInput: 0.02, output: 1.2 },
   // Qualified Anthropic direct profile. Actual invoice discounts are intentionally excluded.
   "claude-sonnet-5": { input: 2, cachedInput: 0.2, output: 10 },
   // Amazon Bedrock global cross-region list price for Claude Sonnet 4.6.

@@ -176,7 +176,7 @@ describe("agent-created hires use managed AI connections", () => {
   });
 
   it.each([
-    ["codex", { provider: "codex", model: "gpt-5.6-sol", codexPermissionMode: "never", lifecycleMode: "per_turn" }],
+    ["codex", { provider: "codex", model: "gpt-6-sol", codexPermissionMode: "never", lifecycleMode: "per_turn" }],
     ["claude", { provider: "acpx", acpxAgent: "claude", model: "claude-sonnet-5", acpxPermissionMode: "approve-all", lifecycleMode: "per_turn" }],
   ] as const)("caller runtime inheritance preserves safe %s settings only", async (_name, parentConfig) => {
     const f = await fixture("anthropic", "subscription");

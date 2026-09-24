@@ -63,7 +63,7 @@ describe("buildCodexLocalConfig", () => {
     });
   });
 
-  it.each([["gpt-6-astra", "ultra"], ["gpt-6-sol", "ultra"], ["gpt-6-luna", "max"], ["gpt-5.6-sol", "ultra"], ["gpt-5.6-terra", "ultra"], ["gpt-5.6-luna", "max"]])("persists the exact %s model and supported controls", (model, effort) => {
+  it.each([["gpt-6-astra", "ultra"], ["gpt-6-sol", "ultra"], ["gpt-6-luna", "max"], ["gpt-5.6-terra", "ultra"]])("persists the exact %s model and supported controls", (model, effort) => {
     const config = buildCodexLocalConfig(
       makeValues({
         model,
@@ -171,7 +171,7 @@ describe("buildPaperclipRunnerConfig", () => {
   it("does not let a stale schema model override the active Codex model", () => {
     expect(buildPaperclipRunnerConfig(makeValues({
       adapterType: "paperclip_runner",
-      model: "gpt-5.6-sol",
+      model: "gpt-6-sol",
       adapterSchemaValues: {
         provider: "codex",
         model: "openrouter/stale-model",
@@ -179,7 +179,7 @@ describe("buildPaperclipRunnerConfig", () => {
       },
     }))).toMatchObject({
       provider: "codex",
-      model: "gpt-5.6-sol",
+      model: "gpt-6-sol",
       codexPermissionMode: "never",
     });
   });
@@ -190,8 +190,8 @@ describe("buildPaperclipRunnerConfig", () => {
   });
 
   it("normalizes the removed ACPX Codex configuration to native Codex", () => {
-    const config = buildPaperclipRunnerConfig(makeValues({ model: "gpt-5.6-sol", adapterSchemaValues: { provider: "acpx", acpxAgent: "codex" } }));
-    expect(config).toMatchObject({ provider: "codex", model: "gpt-5.6-sol" });
+    const config = buildPaperclipRunnerConfig(makeValues({ model: "gpt-6-sol", adapterSchemaValues: { provider: "acpx", acpxAgent: "codex" } }));
+    expect(config).toMatchObject({ provider: "codex", model: "gpt-6-sol" });
     expect(config).not.toHaveProperty("acpxAgent");
   });
 
@@ -278,7 +278,7 @@ describe("buildPaperclipRunnerConfig", () => {
   it("uses the Codex default when no model was selected", () => {
     expect(buildPaperclipRunnerConfig(makeValues({ model: "" }))).toMatchObject({
       provider: "codex",
-      model: "gpt-5.6-sol",
+      model: "gpt-6-sol",
     });
   });
 

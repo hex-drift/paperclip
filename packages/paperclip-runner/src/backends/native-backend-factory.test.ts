@@ -75,7 +75,7 @@ function acpxExecution(
       agent,
       model:
         agent === "codex"
-          ? "gpt-5.6-sol"
+          ? "gpt-6-sol"
           : agent === "pi"
             ? "openrouter/deepseek/deepseek-v4-flash-0731"
             : "claude-sonnet-5",

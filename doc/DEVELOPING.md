@@ -1053,7 +1053,7 @@ unsupported value fails with remediation instead of being silently coerced.
 OpenCode defaults to `allow`, with explicit `ask` and `deny` options; ACPX
 defaults to `approve-all`, with explicit `approve-paperclip`, `approve-reads`,
 and `deny-all` options. Codex conversion keeps a non-empty model and
-otherwise stores the shared `gpt-5.6-sol` default. The native execution boundary
+otherwise stores the shared `gpt-6-sol` default. The native execution boundary
 applies the same default to older runner rows whose model is missing or blank.
 
 For an Agent Chat test drive, enable **Agent Chat** in Experimental settings and

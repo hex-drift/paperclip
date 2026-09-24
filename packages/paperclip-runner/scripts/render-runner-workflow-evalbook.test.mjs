@@ -18,7 +18,7 @@ function fixture(overrides = {}) {
       runnerBuild: "abc123",
       promptPolicyId: "runner-live-workflow-v1",
       providerVersions: {
-        "codex-luna": "codex_app_server:gpt-5.6-luna",
+        "codex-luna": "codex_app_server:gpt-6-luna",
       },
     },
     results: [],
@@ -74,7 +74,7 @@ test("maps a workflow result to the canonical immutable-attempt inputs", () => {
   });
 
   assert.match(attempt.attemptId, /verification-policy-codex-luna/);
-  assert.equal(attempt.artifact.requestedModel, "gpt-5.6-luna");
+  assert.equal(attempt.artifact.requestedModel, "gpt-6-luna");
   assert.equal(attempt.artifact.driver, "codex_app_server");
   assert.equal(attempt.artifact.usage.estimatedCostNanodollars, 2_500_000);
   assert.equal(attempt.score.disposition, "passed");

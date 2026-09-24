@@ -376,13 +376,13 @@ describe("prepareOpenCodeRuntimeConfig", () => {
         "ai-gate": {
           npm: "@ai-sdk/openai-compatible",
           options: { baseURL: "https://ai-gate.example/v1" },
-          models: { "gpt-5.6-luna": { name: "GPT-5.6 Luna" } },
+          models: { "gpt-6-luna": { name: "GPT-5.6 Luna" } },
         },
       },
     });
     const prepared = await prepareOpenCodeRuntimeConfig({
       env: { XDG_CONFIG_HOME: configHome, AI_GATE_API_KEY: "sk-cpa-agent" },
-      config: { model: "ai-gate/gpt-5.6-luna" },
+      config: { model: "ai-gate/gpt-6-luna" },
     });
     cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
     const runtimeConfig = JSON.parse(
@@ -399,13 +399,13 @@ describe("prepareOpenCodeRuntimeConfig", () => {
       provider: {
         "ai-gate": {
           options: { baseURL: "https://ai-gate.example/v1" },
-          models: { "gpt-5.6-luna": {} },
+          models: { "gpt-6-luna": {} },
         },
       },
     });
     const prepared = await prepareOpenCodeRuntimeConfig({
       env: { XDG_CONFIG_HOME: configHome },
-      config: { model: "ai-gate/gpt-5.6-luna" },
+      config: { model: "ai-gate/gpt-6-luna" },
     });
     cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
     const runtimeConfig = JSON.parse(
@@ -421,7 +421,7 @@ describe("prepareOpenCodeRuntimeConfig", () => {
       provider: {
         "ai-gate": {
           options: { baseURL: "https://ai-gate.example/v1" },
-          models: { "gpt-5.6-luna": {} },
+          models: { "gpt-6-luna": {} },
         },
       },
     });
@@ -429,7 +429,7 @@ describe("prepareOpenCodeRuntimeConfig", () => {
     try {
       const prepared = await prepareOpenCodeRuntimeConfig({
         env: { XDG_CONFIG_HOME: configHome },
-        config: { model: "ai-gate/gpt-5.6-luna" },
+        config: { model: "ai-gate/gpt-6-luna" },
       });
       cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
       const runtimeConfig = JSON.parse(
@@ -447,7 +447,7 @@ describe("prepareOpenCodeRuntimeConfig", () => {
       provider: {
         "ai-gate": {
           options: { baseURL: "https://ai-gate.example/v1", apiKey: "sk-cpa-global" },
-          models: { "gpt-5.6-luna": {} },
+          models: { "gpt-6-luna": {} },
         },
       },
     });
@@ -469,13 +469,13 @@ describe("prepareOpenCodeRuntimeConfig", () => {
       provider: {
         "ai-gate": {
           options: { baseURL: "https://ai-gate.example/v1" },
-          models: { "gpt-5.6-luna": {} },
+          models: { "gpt-6-luna": {} },
         },
       },
     });
     const prepared = await prepareOpenCodeRuntimeConfig({
       env: { XDG_CONFIG_HOME: configHome, AI_GATE_API_KEY: "   " },
-      config: { model: "ai-gate/gpt-5.6-luna" },
+      config: { model: "ai-gate/gpt-6-luna" },
     });
     cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
     const runtimeConfig = JSON.parse(
@@ -490,7 +490,7 @@ describe("prepareOpenCodeRuntimeConfig", () => {
     const providers = {
       "ai-gate": {
         options: { baseURL: "https://ai-gate.example/v1", apiKey: "{env:OPENROUTER_API_KEY}" },
-        models: { "gpt-5.6-luna": {} },
+        models: { "gpt-6-luna": {} },
       },
     };
     const prepared = await prepareOpenCodeRuntimeConfig({
@@ -500,7 +500,7 @@ describe("prepareOpenCodeRuntimeConfig", () => {
         OPENROUTER_API_KEY: "sk-or-global",
         AI_GATE_API_KEY: "sk-cpa-agent",
       },
-      config: { model: "ai-gate/gpt-5.6-luna" },
+      config: { model: "ai-gate/gpt-6-luna" },
     });
     cleanupPaths.add(prepared.env.XDG_CONFIG_HOME);
     const runtimeConfig = JSON.parse(

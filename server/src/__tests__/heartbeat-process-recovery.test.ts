@@ -2571,7 +2571,7 @@ describeEmbeddedPostgres("heartbeat orphaned process recovery", () => {
     await withTempPaperclipHome(async () => {
       const { agentId, issueId, runId } = await seedQueuedIssueRunFixture();
       await db.update(agents).set({ adapterType: "paperclip_runner",
-        adapterConfig: { provider: "codex", model: "gpt-5.6-luna" },
+        adapterConfig: { provider: "codex", model: "gpt-6-luna" },
       }).where(eq(agents.id, agentId));
       const factory = vi.fn(() => { throw new Error("provider must not start"); });
       let reachedSelection = false;
@@ -2602,7 +2602,7 @@ describeEmbeddedPostgres("heartbeat orphaned process recovery", () => {
     await withTempPaperclipHome(async () => {
       const { agentId, issueId, runId } = await seedQueuedIssueRunFixture();
       await db.update(agents).set({ adapterType: "paperclip_runner",
-        adapterConfig: { provider: "codex", model: "gpt-5.6-luna" },
+        adapterConfig: { provider: "codex", model: "gpt-6-luna" },
       }).where(eq(agents.id, agentId));
       await db.update(heartbeatRuns).set({ invocationSource: "automation" }).where(eq(heartbeatRuns.id, runId));
       const factory = vi.fn(() => { throw new Error("provider must not start"); });
@@ -2639,7 +2639,7 @@ describeEmbeddedPostgres("heartbeat orphaned process recovery", () => {
         .update(agents)
         .set({
           adapterType: "paperclip_runner",
-          adapterConfig: { provider: "codex", model: "gpt-5.6-luna" },
+          adapterConfig: { provider: "codex", model: "gpt-6-luna" },
         })
         .where(eq(agents.id, agentId));
       await db
@@ -2735,7 +2735,7 @@ describeEmbeddedPostgres("heartbeat orphaned process recovery", () => {
         .update(agents)
         .set({
           adapterType: "paperclip_runner",
-          adapterConfig: { provider: "codex", model: "gpt-5.6-luna" },
+          adapterConfig: { provider: "codex", model: "gpt-6-luna" },
         })
         .where(eq(agents.id, agentId));
       await db
@@ -11670,7 +11670,7 @@ describeEmbeddedPostgres("heartbeat orphaned process recovery", () => {
       if (mode === "native") {
         await db.update(agents).set({
           adapterType: "paperclip_runner",
-          adapterConfig: { provider: "codex", model: "gpt-5.6-luna" },
+          adapterConfig: { provider: "codex", model: "gpt-6-luna" },
         }).where(eq(agents.id, source.agentId));
       }
       const factory = vi.fn(() => { throw new NativeRunnerOwnershipUnverifiedError(); });
@@ -11918,7 +11918,7 @@ describeEmbeddedPostgres("heartbeat orphaned process recovery", () => {
       .update(agents)
       .set({
         adapterType: "paperclip_runner",
-        adapterConfig: { provider: "codex", model: "gpt-5.6-luna" },
+        adapterConfig: { provider: "codex", model: "gpt-6-luna" },
       })
       .where(eq(agents.id, source.agentId));
     await db

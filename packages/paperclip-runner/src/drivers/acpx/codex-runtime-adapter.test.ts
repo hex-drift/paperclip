@@ -124,7 +124,7 @@ describe("Codex ACPX runtime adapter", () => {
       mode: "persistent",
       cwd: "/workspace",
       sessionOptions: {
-        model: "gpt-5.6-sol",
+        model: "gpt-6-sol",
         systemPrompt: { append: "Use Paperclip tools." },
       },
     });
@@ -280,8 +280,8 @@ describe("Codex ACPX runtime adapter", () => {
       request_token_usage: { prompt: { input_tokens: 12, output_tokens: 30 } },
       cumulative_cost: { amount: 0.1, currency: "USD" },
       acpx: {
-        current_model_id: "gpt-5.6-sol",
-        available_models: ["gpt-5.6-sol"],
+        current_model_id: "gpt-6-sol",
+        available_models: ["gpt-6-sol"],
       },
     } as never;
     const durableStore: AcpSessionStore = {
@@ -302,17 +302,17 @@ describe("Codex ACPX runtime adapter", () => {
       requestTokenUsage: { prompt: { input_tokens: 12, output_tokens: 30 } },
       usageCost: { amount: 0.1, currency: "USD" },
       models: {
-        currentModelId: "gpt-5.6-sol",
-        availableModelIds: ["gpt-5.6-sol"],
+        currentModelId: "gpt-6-sol",
+        availableModelIds: ["gpt-6-sol"],
       },
     });
     expect(durableStore.load).toHaveBeenCalledWith("record-1");
     expect(runtime.getStatus).not.toHaveBeenCalled();
-    await port.setModel?.("gpt-5.6-sol");
+    await port.setModel?.("gpt-6-sol");
     expect(runtime.setConfigOption).toHaveBeenCalledWith({
       handle: HANDLE,
       key: "model",
-      value: "gpt-5.6-sol",
+      value: "gpt-6-sol",
     });
     await port.close({ reason: "test complete" });
     expect(runtime.close).toHaveBeenCalledWith({
@@ -1425,7 +1425,7 @@ describe("Codex ACPX runtime adapter", () => {
       createRuntime: (options) => { runtimeOptions = options; return runtime; },
     });
     let admitted = false;
-    const selection = port.setModel!("gpt-5.6-sol").then(() => { admitted = true; });
+    const selection = port.setModel!("gpt-6-sol").then(() => { admitted = true; });
     void selection.catch(() => undefined);
     await vi.waitFor(() => expect(command.spawn).toHaveBeenCalledOnce());
     expect(admitted).toBe(false);
@@ -1481,7 +1481,7 @@ describe("Codex ACPX runtime adapter", () => {
         },
       },
     );
-    await port.setModel!("gpt-5.6-sol");
+    await port.setModel!("gpt-6-sol");
     expect(openCommand).toHaveBeenCalledOnce();
     const turn = port.startTurn({ text: "Resume", requestId: "cold-turn" });
     await expect(turn.result).resolves.toMatchObject({ status: "completed" });
@@ -1632,9 +1632,9 @@ describe("Codex ACPX runtime adapter", () => {
   });
 
   it.each([
-    ["codex", "gpt-5.6-sol", "approve-all", { outcome: "allow_once" }],
-    ["codex", "gpt-5.6-sol", "approve-reads", { outcome: "reject_once" }],
-    ["codex", "gpt-5.6-sol", "deny-all", { outcome: "reject_once" }],
+    ["codex", "gpt-6-sol", "approve-all", { outcome: "allow_once" }],
+    ["codex", "gpt-6-sol", "approve-reads", { outcome: "reject_once" }],
+    ["codex", "gpt-6-sol", "deny-all", { outcome: "reject_once" }],
     ["claude", "claude-sonnet-5", "approve-all", { outcome: "allow_once" }],
     ["claude", "claude-sonnet-5", "approve-reads", { outcome: "reject_once" }],
     ["claude", "claude-sonnet-5", "approve-paperclip", { outcome: "reject_once" }],
@@ -1678,7 +1678,7 @@ describe("Codex ACPX runtime adapter", () => {
         structuredClone({
           acpxRecordId: "record-1",
           acpSessionId: "backend-1",
-          acpx: { current_model_id: "gpt-5.6-sol" },
+          acpx: { current_model_id: "gpt-6-sol" },
         } as never),
       ),
       save: vi.fn(),
@@ -1697,7 +1697,7 @@ describe("Codex ACPX runtime adapter", () => {
     await expect(port.getStatus()).resolves.toMatchObject({
       backendSessionId: "backend-1",
       agentSessionId: "backend-1",
-      models: { currentModelId: "gpt-5.6-sol" },
+      models: { currentModelId: "gpt-6-sol" },
     });
     expect(runtime.close).not.toHaveBeenCalled();
   });
@@ -2767,8 +2767,8 @@ function openOptions(
       agentRuntimePackage: null,
       agentRuntimeVersion: null,
       commandDigest: "sha256:test",
-      qualificationModel: "gpt-5.6-sol",
-      reportedModelId: "gpt-5.6-sol",
+      qualificationModel: "gpt-6-sol",
+      reportedModelId: "gpt-6-sol",
       permissionPolicy: "interactive",
     },
     cwd: "/workspace",

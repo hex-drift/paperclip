@@ -491,7 +491,7 @@ describe("qualified ACPX runtime sidecar", () => {
       result: {
         profile: {
           agent: "codex",
-          qualificationModel: "gpt-5.6-sol",
+          qualificationModel: "gpt-6-sol",
         },
         capabilities: {
           persistentSessions: true,
@@ -570,7 +570,7 @@ describe("qualified ACPX runtime sidecar", () => {
 function initializeRequest(
   id: number,
   agent: string,
-  model = "gpt-5.6-sol",
+  model = "gpt-6-sol",
 ): Record<string, unknown> {
   return {
     protocolVersion: ACPX_SIDECAR_PROTOCOL_VERSION,

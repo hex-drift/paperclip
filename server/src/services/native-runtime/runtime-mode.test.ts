@@ -102,7 +102,7 @@ describe("resolveNativeRuntimeMode", () => {
     });
     expect(resolveNativeRuntimeMode({
       ...eligible,
-      adapterConfig: { provider: "acpx", acpxAgent: "codex", model: "gpt-5.6-sol" },
+      adapterConfig: { provider: "acpx", acpxAgent: "codex", model: "gpt-6-sol" },
     })).toMatchObject({
       kind: "native",
       profile: { backend: "acpx_runtime" },
@@ -112,7 +112,7 @@ describe("resolveNativeRuntimeMode", () => {
   it("rejects malformed OpenCode and unqualified ACPX profiles", () => {
     expect(() => resolveNativeRuntimeMode({
       ...eligible,
-      adapterConfig: { provider: "opencode", model: "gpt-5.6-sol" },
+      adapterConfig: { provider: "opencode", model: "gpt-6-sol" },
     })).toThrow(expect.objectContaining({
       code: "paperclip_runner_opencode_model_invalid",
     }));

@@ -3,7 +3,7 @@
 ## Execution target
 
 The isolated live agent remains Maya E2E, `31f56712-3944-423e-b7c7-404bb8fbb993`,
-using `paperclip_runner` and `gpt-5.6-luna`. The initial live runner binary was
+using `paperclip_runner` and `gpt-6-luna`. The initial live runner binary was
 `af19f64dfdf7e2e4efb5b41275e26cd873338315207c36fd4d108bdb69bae3c1`.
 Actual Codex app-server source/continuation evidence and measured Slack,
 Discord, and Telegram timings are recorded in the
@@ -218,7 +218,7 @@ at 12:28:39.398. User comment `5585134211` reached the webhook-only proxy at
 12:28:41.889 (202 in 67.749 ms) and was durably received at 12:28:42.602.
 Run `e12b49b9-5798-4700-8f01-e77b759f19e5` ran from 12:28:43.404 to
 12:28:57.439 using actual `codex_app_server`; its persisted native provider
-configuration is `gpt-5.6-luna`. It retained provider session
+configuration is `gpt-6-luna`. It retained provider session
 `01a080dc-602e-7033-8c92-e417668c57fb`, returned an accepted yielded result,
 and published the actual answer `GH-LUNA-ANSWER-DELIVERED` at 12:28:58.566.
 Working feedback and the final each used one attempt and the same GitHub
@@ -282,7 +282,7 @@ Browser input became responsive again. The earlier prepared drafts were not
 counted; the following are newly submitted, provider-visible requests on the
 `84a601459` server and staged `a0fd2789…` runner. All four active endpoints
 (Slack, Discord, GitHub, Telegram) still bind to Maya E2E with adapter
-`paperclip_runner` and configured model `gpt-5.6-luna`. Each run below also
+`paperclip_runner` and configured model `gpt-6-luna`. Each run below also
 independently records `driver_kind=codex_app_server` and the same model in its
 native execution profile. No Terra substitution or legacy adapter was used.
 
@@ -629,7 +629,7 @@ claim or evidence reconciliation work. Historical blocked entries and
 quarantined state remained intact.
 
 The following fresh requests were sent through the signed-in in-app browser.
-Every persisted execution profile is native Codex app-server / `gpt-5.6-luna`.
+Every persisted execution profile is native Codex app-server / `gpt-6-luna`.
 Times below distinguish runtime from submission-to-final-provider-publication.
 
 | Provider | Run                                    |  Runtime | End-to-end | Authored summary | Visible result                                                                                 |
@@ -958,7 +958,7 @@ provider browsers and saw each final reply with its working state cleared:
 | GitHub   | `73ce21b7-9cd8-4380-9bd7-69c9f6992dfb` | 12.686 s             | 17.148 s              |
 | Telegram | `823d811f-daad-4bd3-91c0-c1dbdf587e3f` | 14.046 s             | 16.602 s              |
 
-Persisted execution profiles confirm `gpt-5.6-luna` for all three. Each
+Persisted execution profiles confirm `gpt-6-luna` for all three. Each
 working/final operation used one attempt and the same provider message:
 Slack `1788884841.421029`, GitHub `5588442165`, Telegram `417200359:132`.
 No duplicate final reply was observed. Slack's browser initially retained an
@@ -1115,7 +1115,7 @@ exactly `ADMITTED-NATIVE-LUNA` on the existing tasks.
 | Telegram | `7a4e76f1-1a97-4ee3-b004-8bba06ff5426` | 13.267 s             | 15.940 s              |
 
 All three runs succeeded and their persisted profiles specify native
-`gpt-5.6-luna`. Root saw each exact final reply and the working indicator
+`gpt-6-luna`. Root saw each exact final reply and the working indicator
 clear. Each working/final operation used one attempt and updated one provider
 message: Slack `1788886677.466519`, GitHub `5588819297`, Telegram
 `417200359:134`. No duplicate final was observed. This is a continuation smoke,
@@ -1191,7 +1191,7 @@ error banner appeared. This covers the final company-navigation merge, not
 every viewport or transition timing.
 
 New signed-in browser file checks on server 48 used native Codex app-server
-with persisted **`gpt-5.6-luna`** (effective reasoning effort unverified):
+with persisted **`gpt-6-luna`** (effective reasoning effort unverified):
 
 | Journey                                            | Native execution | Submission to useful result |
 | -------------------------------------------------- | ---------------- | --------------------------- |
@@ -1298,7 +1298,7 @@ current-task cluster remained to clean up; no further unchanged retry was run.
 ### Reasoning-effort evidence correction
 
 The live runs demonstrably use native Paperclip Runner, Codex app-server and
-`gpt-5.6-luna`. Earlier notes also called them low reasoning because Maya's
+`gpt-6-luna`. Earlier notes also called them low reasoning because Maya's
 agent configuration contains `modelReasoningEffort: "low"`. A final audit
 found that this legacy field is **not projected by the native execution path**.
 The measured timing, provider identity, bytes and delivery results remain valid;
@@ -1637,7 +1637,7 @@ lossless original attempt `3841622183075921920`, GUID
 the proxy at **19:12:44.614** and received **202 in 125.004 milliseconds**.
 The durable worker processed it once. One exact-comment wake started native
 run `df20e1e9-86a9-4095-82db-eaee0b167a10` at **19:12:47.515**, on the existing
-task key `CHA-9`, using Codex app-server and **`gpt-5.6-luna`**. The run completed
+task key `CHA-9`, using Codex app-server and **`gpt-6-luna`**. The run completed
 at **19:13:06.770**: **19.255 seconds** of native execution.
 
 GitHub displayed one eyes reaction and one bot reply, `5590453600`. Root
@@ -1673,7 +1673,7 @@ A normal GitHub continuation then checked all final source on server 53.
 Root submitted `GH-RECOVERY-FINAL-CHECK-0908` at **19:23:27.406 UTC**, creating
 comment `5590582825`. The exact-comment wake started run
 `bd88474f-52be-4281-aa77-fcc394e559d9` at **19:23:31.421**, using the native
-runner, Codex app-server and `gpt-5.6-luna` on the existing task. It completed
+runner, Codex app-server and `gpt-6-luna` on the existing task. It completed
 at **19:23:49.899**, after **18.478 seconds**. Working and final publications
 each used one attempt and the same bot message, `5590584027`. The exact final
 `GH-FINAL-CHECK-READY` was published at **19:23:50.786**: **23.380 seconds**
@@ -1755,7 +1755,7 @@ current design, production code and test coverage are retained.
 Full merged workspace typecheck and build passed. Root reloaded the live Board
 after a transient `useCompany` error during merge editing; the normal reload
 restored Activity, agent overview and Channels. The overview identifies
-Paperclip Runner and `gpt-5.6-luna`. The new upstream section heading duplicated
+Paperclip Runner and `gpt-6-luna`. The new upstream section heading duplicated
 the Channels panel's own heading. A browser regression reproduced **two**
 headings where one was expected. The parent now leaves this title to its
 existing panel. Root inspected before/after screenshots and verified one
@@ -1815,7 +1815,7 @@ one 500-file PR without removing current implementation or tests.
 
 Before installing the socket repair, server 55 served the clean merged head.
 GitHub comment `5590988738` produced exactly one native Codex app-server /
-`gpt-5.6-luna` run (`ec9060b7-0cd3-4faa-9823-49fa4851f3a4`) and one working-to-final
+`gpt-6-luna` run (`ec9060b7-0cd3-4faa-9823-49fa4851f3a4`) and one working-to-final
 bot message `5590989975`. The exact final `GH-ONBOARDING-MERGE-READY` arrived in
 **21.209 seconds**, including **15.963 seconds** of native execution. Root
 inspected the rendered reply. Telegram likewise returned the exact
@@ -1911,7 +1911,7 @@ at **20:27:45.773** on September 8. Its server baseline is `63c8b5d8d`; the
 subsequent wireframe-only commit changes no runtime bytes. The runner SHA-256
 remains `e758b7cdb6ba7c9f176d89cbd17b98dc4c42975326012582d6a7cdf230fb0373`.
 Both journeys used Maya E2E, native Paperclip Runner, Codex app-server and
-`gpt-5.6-luna`. They do not qualify the uncommitted exact-retry implementation.
+`gpt-6-luna`. They do not qualify the uncommitted exact-retry implementation.
 
 ### Slack: edited-source reuse is refused without leaking a file
 
@@ -2531,7 +2531,7 @@ ownership-barrier verification.
 From the live Board dashboard, root opened original failed run
 `38dfc3ec-4fa7-4ed4-8563-7650dfce3d47` and used its Retry control once. New run
 `7c4827a6-705a-4295-8196-f51a821a4af3` retained the exact latest wake comment and
-source-run link. The Board showed Paperclip Runner / Codex / `gpt-5.6-luna`,
+source-run link. The Board showed Paperclip Runner / Codex / `gpt-6-luna`,
 then success in 15 seconds. In the private disposable GitHub QA repository,
 comment `5593571969` changed from working feedback to exactly
 `CONTROL-FIRST-B-READY`. Refresh and screenshot inspection confirmed persistence
@@ -2695,7 +2695,7 @@ remote byte hashes; exact-byte checks here are deterministic local API tests.
 
 Server 64 runs `58de1c105` on loopback 3137 with the normally built runner
 `4acf2d1dbe99a6202d07b6d0be73b469ebf153103cda2bbd097e5e4233fcd57a`.
-Maya uses Paperclip Runner / Codex app-server / `gpt-5.6-luna`, not a legacy
+Maya uses Paperclip Runner / Codex app-server / `gpt-6-luna`, not a legacy
 adapter. Signed-in provider UI created Discord thread `1547043763581358111`
 (CHA-32) and Slack thread `1788914422.188869` (CHA-33). Initial checklist and
 short follow-up turns succeeded; these first pairs were sequential, not a
@@ -3026,7 +3026,7 @@ succeeded: the Mac is now unlocked and live provider qualification can resume.
 Root used the signed-in in-app Discord thread and Slack thread as the user,
 uploaded the same PNG and TXT, and sent the same media request body with a new
 diagnostic marker. Each request ran alone on Maya's existing native Codex
-app-server session using `gpt-5.6-luna`. Child agents had no browser surface and
+app-server session using `gpt-6-luna`. Child agents had no browser surface and
 independently correlated only scoped delivery, run, publication and canonical
 tool metadata. No fixture outcomes were inserted into the database.
 
@@ -3288,7 +3288,7 @@ no request to a live provider or the live proxy.
 
 The native reasoning-effort audit found a missing capability, not a supported
 field being dropped. Maya's five latest succeeded native runs freeze a Codex
-provider profile containing kind, `gpt-5.6-luna` and approval policy `never`,
+provider profile containing kind, `gpt-6-luna` and approval policy `never`,
 without reasoning effort. Native v4 is a closed contract: injected
 `reasoningEffort` or `modelReasoningEffort` is rejected, and legacy low versus
 high configuration resolves to the same native profile. Only the legacy local
@@ -5107,7 +5107,7 @@ provider results do not satisfy its live qualification.
 
 All provider actions used the already signed-in in-app browser, Eigenjoy's
 account and the existing Maya bot. The live process still loaded server 78
-(`ea528f44c`), with `paperclip_runner` / Codex / `gpt-5.6-luna`.
+(`ea528f44c`), with `paperclip_runner` / Codex / `gpt-6-luna`.
 
 DM command attempts at 13:20 and 13:25 were rejected before Paperclip because
 Discord required a shared guild with DMs enabled. They later appeared as
@@ -5411,7 +5411,7 @@ Exact run events, performance spans, ingress/interaction receipts and published
 outbox rows were correlated for the following real Slack and Discord journeys.
 These are server 79 observations, not server 80 qualification or latency
 percentiles. All eight persisted `nativeExecutionInput.provider` descriptors
-identify `codex` / `gpt-5.6-luna`, with native `codex_app_server` execution.
+identify `codex` / `gpt-6-luna`, with native `codex_app_server` execution.
 They contain no explicit reasoning-effort field; the applied effort is unknown.
 
 | Case / heartbeat run ID | Run start → finish | Runner startup | Provider submitted → started | Provider started → accepted result | Source → visible result |
@@ -6482,7 +6482,7 @@ Fresh Discord source `1547313499208683542` continued CHA-43 and answered once
 as `1547313508213985301`. Fresh Telegram source195 created CHA-50 and answered
 once as196. Actual browser text and durable receipts agree. All thirteen live83
 runs record `runtime_mode=native`, `driver_kind=codex_app_server` and persisted
-execution-input model `gpt-5.6-luna`; no raw reasoning or tool logs were posted.
+execution-input model `gpt-6-luna`; no raw reasoning or tool logs were posted.
 
 | Short request | Ingress-to-final | Run time | Publication attempts |
 | --- | ---: | ---: | ---: |
@@ -7445,7 +7445,7 @@ not an assertion that the inbound payload was exactly `message.video`.
 Delivery `0666424f-a400-40f2-8afd-a767a5cd8082`, source `417200359:199`, arrived
 at 21:53:44.385 and processed on attempt one at 45.663. The current comment
 owns attachment `98dd8a43-7b51-4d0f-a69b-46aa8ee656fd`; its bytes match the
-fixture. Native `codex_app_server` / `gpt-5.6-luna` run
+fixture. Native `codex_app_server` / `gpt-6-luna` run
 `7d003f86-755b-4c90-b20d-6c6476d8ceb4` started at 45.691 and succeeded at
 21:54:46.360. Working and progress updates reused message 200; the final
 description edited it at 47.033, correctly describing the one-second teal

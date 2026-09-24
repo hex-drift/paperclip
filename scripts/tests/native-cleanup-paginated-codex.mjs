@@ -105,7 +105,7 @@ async function withServer(home, callback) {
   }
 }
 const result = await withServer(home, (rpc) =>
-  rpc("thread/start", { cwd: home, model: "gpt-5.6-luna", ephemeral: false }),
+  rpc("thread/start", { cwd: home, model: "gpt-6-luna", ephemeral: false }),
 );
 const threadId = result.thread.id;
 const canonicalHome = await realpath(home);
@@ -171,7 +171,7 @@ await withServer(canonicalHome, (rpc) =>
   rpc("thread/resume", {
     threadId,
     cwd: canonicalHome,
-    model: "gpt-5.6-luna",
+    model: "gpt-6-luna",
     excludeTurns: true,
   }),
 );
@@ -210,7 +210,7 @@ const resume = (rpc) =>
   rpc("thread/resume", {
     threadId,
     cwd: copied,
-    model: "gpt-5.6-luna",
+    model: "gpt-6-luna",
     excludeTurns: true,
   });
 let red;
@@ -243,7 +243,7 @@ const activated = await withServer(canonicalHome, (rpc) =>
   rpc("thread/resume", {
     threadId,
     cwd: canonicalHome,
-    model: "gpt-5.6-luna",
+    model: "gpt-6-luna",
     excludeTurns: true,
   }),
 );
